@@ -19,7 +19,6 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            console.log(await CemiseService.listPosts());
             response.send(await CemiseService.listPosts());
         },
     });
@@ -36,7 +35,6 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const post: NewPost = request.body;
             const ns = await CemiseService.addPost(post, request.user);
-            console.log(ns)
             response.status(201).send(ns[0]);
         },
     });
@@ -56,12 +54,12 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { postId } = request.params;
             const posts = await CemiseService.getPost(postId);
+
             if (posts.length) {
                 response.send(posts);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
-
         },
     });
 
@@ -82,12 +80,12 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const { postId } = request.params;
             const postData: NewPost = request.body;
             const post = await CemiseService.updatePost(postData, postId);
+
             if (post.length) {
                 response.send(post[0]);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
-
         },
     });
 }
