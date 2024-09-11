@@ -18,7 +18,7 @@ export const post = sqliteTable(
             .default(sql`(CURRENT_TIMESTAMP)`)
             .$onUpdateFn(() => sql`(CURRENT_TIMESTAMP)`),
         language: text("language", { enum: ["EN", "PT"] }).notNull(),
-        url: text("url").notNull(),
+        url: text("url").notNull().unique(),
         title: text("title").notNull(),
         tagline: text("tagline").notNull(),
         content: text("content").notNull(),
