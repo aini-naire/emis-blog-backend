@@ -5,15 +5,22 @@ import { join } from "desm";
 
 import { databasePlugin } from "@blog/plugins/database.js";
 import swagger from "@blog/plugins/swagger.js";
+import { JWT, fastifyJwt } from "@fastify/jwt";
+import { Static, Type } from "@fastify/type-provider-typebox";
 
-const confSchema = {
-  type: "object",
-  required: ["NODE_ENV", "PORT"],
-  properties: {
-    NODE_ENV: {type: "string",},
-    PORT: {type: "number",},
-  },
-};
+type ConfigSchema = Static<typeof ConfigSchema>
+const ConfigSchema = Type.Object({
+  NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production')]),
+  PORT: Type.Number(),
+  JWT_SECRET: Type.String()
+})
+
+declare module "fastify" {
+  interface FastifyInstance {
+    jwt: JWT;
+    config: ConfigSchema
+  }
+}
 
 const main = async () => {
   const f = fastify({
@@ -21,8 +28,11 @@ const main = async () => {
   });
 
   f.log.info("Setting up plugins");
-  await f.register(Env, { schema: confSchema, dotenv: true });
-  await f.register(databasePlugin);
+  await f.register(Env, { schema: ConfigSchema, dotenv: true });
+  f.register(databasePlugin);
+  f.register(fastifyJwt, {
+    secret: f.config.JWT_SECRET
+  })
   if (f.config.NODE_ENV !== "production") {
     f.register(swagger);
   }

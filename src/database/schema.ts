@@ -14,7 +14,9 @@ export const post = sqliteTable(
     hidden: integer("hidden", { mode: "boolean" }),
     authorId: text("author_Id").references(() => users.id),
     created: text("created").default(sql`(CURRENT_TIMESTAMP)`),
-    modified: text("modified").default(sql`(CURRENT_TIMESTAMP)`).$onUpdateFn(() => sql`(CURRENT_TIMESTAMP)`),
+    modified: text("modified")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .$onUpdateFn(() => sql`(CURRENT_TIMESTAMP)`),
     language: text("language", { enum: ["en", "pt"] }).notNull(),
     url: text("url").notNull(),
     title: text("title").notNull(),
@@ -71,11 +73,15 @@ export const postTagsRelations = relations(postTags, ({ one }) => ({
 }));
 
 export const users = sqliteTable("users", {
-  id: text("id").primaryKey().$defaultFn(() => randomUUID()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
   username: text("username"),
   password: text("password"),
   email: text("email"),
   fullName: text("full_name"),
 });
 
-export type NewPost2 = typeof users.$inferSelect; // insert type
+export type Post = typeof post.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type Tag = typeof tag.$inferSelect;

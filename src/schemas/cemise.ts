@@ -52,3 +52,27 @@ export const User = Type.Object({
   email: Type.String(),
   fullName: Type.String()
 })
+
+export type NewUser = Static<typeof NewUser>
+export const NewUser = Type.Object({
+  username: Type.String(),
+  email: Type.String(),
+  password: Type.String(),
+  fullName: Type.String()
+})
+
+export type UserCredentials = Static<typeof UserCredentials>
+export const UserCredentials = Type.Object({
+  username: Type.String(),
+  password: Type.String(),
+})
+
+export type UserAccessToken = Static<typeof UserAccessToken>
+export const UserAccessToken = Type.Object({
+  accessToken: Type.String(),
+})
+
+export type Error = Static<typeof Error>
+export const Error = Type.Object({
+  message: Type.String(),
+})
