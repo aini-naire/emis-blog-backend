@@ -1,4 +1,3 @@
-import {  } from "@blog/database/schema.js";
 import { NewPost, Post } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
@@ -18,7 +17,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
       },
     },
     handler: async (request, response) => {
-      console.log( await CemiseService.listPosts());
+      console.log(await CemiseService.listPosts());
       response.send(await CemiseService.listPosts());
     },
   });
@@ -28,13 +27,13 @@ export default async function postRoutes(fastify: FastifyInstance) {
       tags: ["CEMISE POSTS"],
       body: NewPost,
       response: {
-        200: Post,
+        201: Post,
       },
     },
     handler: async (request, response) => {
       const post: NewPost = request.body;
       const ns = await CemiseService.addPost(post);
-      return ns[0];
+      response.send(201, ns[0]);
     },
   });
 }
