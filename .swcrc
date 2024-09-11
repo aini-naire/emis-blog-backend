@@ -1,0 +1,16 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript"
+    },
+    "baseUrl": "./",
+    "paths": {
+      "@blog/*": ["src/*"]
+    },
+    "target": "esnext"
+  },
+  "module": {
+    "type": "nodenext"
+  },
+  "sourceMaps": true
+}
