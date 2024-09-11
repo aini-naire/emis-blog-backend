@@ -38,7 +38,8 @@ export const Post = Type.Object({
     title: Type.String(),
     tagline: Type.String(),
     content: Type.String(),
-    author: Type.Optional(Author)
+    author: Type.Optional(Author),
+    showAuthor: Type.Boolean()
 })
 
 export type Tag = Static<typeof Tag>

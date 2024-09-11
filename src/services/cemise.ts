@@ -22,6 +22,14 @@ export default {
         return database.query.post.findMany({ with: { author: true } }).execute();
     },
 
+    getPost: async function (id: string): Promise<Post[]> {
+        return database.query.post.findMany({ where: (post, { eq }) => (eq(post.id, id)), with: { author: true } }).execute();
+    },
+
+    updatePost: async function (postData: Post, id: string): Promise<Post[]> {
+        return database.update(post).set(postData).where(and(eq(post.id, id), eq(post.language, postData.language))).returning();
+    },
+
     addUser: async function (userData: User): Promise<User[]> {
         userData.password = await bcrypt.hash(userData.password, 10);
         return database.insert(users).values(userData).returning();
