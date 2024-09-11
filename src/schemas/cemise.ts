@@ -26,22 +26,6 @@ export const Author = Type.Object({
     fullName: Type.String()
 })
 
-export type Post = Static<typeof Post>
-export const Post = Type.Object({
-    id: Type.String({ 'format': 'uuid' }),
-    hidden: Type.Boolean(),
-    authorId: Type.String({ 'format': 'uuid' }),
-    created: Type.String(),
-    modified: Type.String(),
-    language: Language,
-    url: Type.String(),
-    title: Type.String(),
-    tagline: Type.String(),
-    content: Type.String(),
-    author: Type.Optional(Author),
-    showAuthor: Type.Boolean()
-})
-
 export type Tag = Static<typeof Tag>
 export const Tag = Type.Object({
     id: Type.Optional(Type.String({ 'format': 'uuid' })),
@@ -56,6 +40,23 @@ export const User = Type.Object({
     username: Type.String(),
     email: Type.String(),
     fullName: Type.String()
+})
+
+export type Post = Static<typeof Post>
+export const Post = Type.Object({
+    id: Type.String({ 'format': 'uuid' }),
+    hidden: Type.Boolean(),
+    authorId: Type.String({ 'format': 'uuid' }),
+    created: Type.String(),
+    modified: Type.String(),
+    language: Language,
+    url: Type.String(),
+    title: Type.String(),
+    tagline: Type.String(),
+    content: Type.String(),
+    author: Type.Optional(Author),
+    showAuthor: Type.Boolean(),
+    tags: Type.Optional(Type.Array(Tag))
 })
 
 export type NewUser = Static<typeof NewUser>

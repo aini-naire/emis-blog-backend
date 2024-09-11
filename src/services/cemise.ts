@@ -13,13 +13,21 @@ export default {
         return database.query.tag.findMany().execute();
     },
 
+    getTag: async function (id: string): Promise<Post[]> {
+        return database.query.tag.findMany({ where: (tag, { eq }) => (eq(tag.id, id)) }).execute();
+    },
+
+    updateTag: async function (tagData: Post, id: string): Promise<Post[]> {
+        return database.update(tag).set(tagData).where(and(eq(tag.id, id), eq(tag.language, tagData.language))).returning();
+    },
+
     addPost: async function (postData: Post, user: User): Promise<Post[]> {
         postData.authorId = user.id;
         return database.insert(post).values(postData).returning();
     },
 
     listPosts: async function (): Promise<Post[]> {
-        return database.query.post.findMany({ with: { author: true } }).execute();
+        return database.query.post.findMany({ with: { author: true, postTags: true } }).execute();
     },
 
     getPost: async function (id: string): Promise<Post[]> {
