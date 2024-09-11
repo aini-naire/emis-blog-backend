@@ -4,36 +4,36 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
 export default async function postRoutes(fastify: FastifyInstance) {
-  const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
+    const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
-  server.get("/posts", {
-    schema: {
-      tags: ["CEMISE POSTS"],
-      response: {
-        200: {
-          type: "array",
-          items: Post,
+    server.get("/posts", {
+        schema: {
+            tags: ["CEMISE POSTS"],
+            response: {
+                200: {
+                    type: "array",
+                    items: Post,
+                },
+            },
         },
-      },
-    },
-    handler: async (request, response) => {
-      console.log(await CemiseService.listPosts());
-      response.send(await CemiseService.listPosts());
-    },
-  });
+        handler: async (request, response) => {
+            console.log(await CemiseService.listPosts());
+            response.send(await CemiseService.listPosts());
+        },
+    });
 
-  server.post("/post", {
-    schema: {
-      tags: ["CEMISE POSTS"],
-      body: NewPost,
-      response: {
-        201: Post,
-      },
-    },
-    handler: async (request, response) => {
-      const post: NewPost = request.body;
-      const ns = await CemiseService.addPost(post);
-      response.send(201, ns[0]);
-    },
-  });
+    server.post("/post", {
+        schema: {
+            tags: ["CEMISE POSTS"],
+            body: NewPost,
+            response: {
+                201: Post,
+            },
+        },
+        handler: async (request, response) => {
+            const post: NewPost = request.body;
+            const ns = await CemiseService.addPost(post);
+            response.send(201, ns[0]);
+        },
+    });
 }
