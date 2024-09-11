@@ -1,15 +1,20 @@
-import { Post, post, User, users } from "@blog/database/schema.js";
+import { Post, post, tag, User, users } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
-import { UserCredentials } from "@blog/schemas/cemise.js";
+import { Tag, UserCredentials } from "@blog/schemas/cemise.js";
 import * as bcrypt from "bcrypt";
 import { and, eq } from "drizzle-orm";
 
 export default {
-    addTag: async function () { },
+    addTag: async function (tagData: Tag, user: User): Promise<Tag[]> {
+        return database.insert(tag).values(tagData).returning();
+    },
 
-    listTags: async function () { },
+    listTags: async function (): Promise<Tag[]> {
+        return database.query.tag.findMany().execute();
+    },
 
-    addPost: async function (postData: Post): Promise<Post[]> {
+    addPost: async function (postData: Post, user: User): Promise<Post[]> {
+        postData.authorId = user.id;
         return database.insert(post).values(postData).returning();
     },
 

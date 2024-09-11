@@ -7,6 +7,7 @@ import { databasePlugin } from "@blog/plugins/database.js";
 import swagger from "@blog/plugins/swagger.js";
 import { FastifyJWT, JWT, fastifyJwt } from "@fastify/jwt";
 import { Static, Type } from "@fastify/type-provider-typebox";
+import { User } from "./schemas/cemise.js";
 
 type ConfigSchema = Static<typeof ConfigSchema>
 const ConfigSchema = Type.Object({
@@ -38,7 +39,7 @@ const main = async () => {
         const token = request.headers.authorization
 
         if (token) {
-            const payload = server.jwt.verify<FastifyJWT['user']>(token.replace("Bearer ", ""))
+            const payload:User = server.jwt.verify<FastifyJWT['user']>(token.replace("Bearer ", ""))
             request.user = payload
         } else {
             return response.code(401).send({ message: 'auth_required' })

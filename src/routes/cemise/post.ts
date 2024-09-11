@@ -5,7 +5,7 @@ import type { FastifyInstance } from "fastify";
 
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
-    server.addHook("onRequest", server.auth)
+    server.addHook("onRequest", server.auth);
 
     server.get("/posts", {
         schema: {
@@ -24,7 +24,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
     });
 
-    server.post("/post", {
+    server.post("/posts", {
         schema: {
             tags: ["CEMISE POSTS"],
             body: NewPost,
@@ -35,8 +35,9 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const post: NewPost = request.body;
-            const ns = await CemiseService.addPost(post);
-            response.send(201, ns[0]);
+            const ns = await CemiseService.addPost(post, request.user);
+            console.log(ns)
+            response.status(201).send(ns[0]);
         },
     });
 }
