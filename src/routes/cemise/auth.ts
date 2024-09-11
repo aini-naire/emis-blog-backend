@@ -20,7 +20,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             const user = await CemiseService.login(credentials);
             if (user) {
                 const token = fastify.jwt.sign(user as User)
-                return {accessToken: token};
+                return { accessToken: token };
             } else {
                 return response.code(401).send({
                     message: 'auth_error',

@@ -5,6 +5,7 @@ import type { FastifyInstance } from "fastify";
 
 export default async function userRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
+    server.addHook("onRequest", server.auth)
 
     server.get("/users", {
         schema: {
@@ -15,6 +16,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
                     items: User,
                 },
             },
+            security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
             console.log(await CemiseService.listUsers());
@@ -29,6 +31,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
             response: {
                 200: User,
             },
+            security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
             const userData: NewUser = request.body;

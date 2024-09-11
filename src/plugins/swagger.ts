@@ -15,6 +15,15 @@ async function swaggerGenerator(fastify: FastifyInstance) {
       schemes: ["http"],
       consumes: ["application/json"],
       produces: ["application/json"],
+      components: {
+        securitySchemes: {
+          CemiseAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT"
+          }
+        }
+      }
     },
     exposeRoute: fastify.config.NODE_ENV !== "production",
   });

@@ -1,51 +1,63 @@
-import { fastify, FastifyInstance } from "fastify";
+import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import Env from "@fastify/env";
 import AutoLoad from "@fastify/autoload";
 import { join } from "desm";
 
 import { databasePlugin } from "@blog/plugins/database.js";
 import swagger from "@blog/plugins/swagger.js";
-import { JWT, fastifyJwt } from "@fastify/jwt";
+import { FastifyJWT, JWT, fastifyJwt } from "@fastify/jwt";
 import { Static, Type } from "@fastify/type-provider-typebox";
 
 type ConfigSchema = Static<typeof ConfigSchema>
 const ConfigSchema = Type.Object({
-  NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production')]),
-  PORT: Type.Number(),
-  JWT_SECRET: Type.String()
+    NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production')]),
+    PORT: Type.Number(),
+    JWT_SECRET: Type.String()
 })
 
 declare module "fastify" {
-  interface FastifyInstance {
-    jwt: JWT;
-    config: ConfigSchema
-  }
+    interface FastifyInstance {
+        jwt: JWT;
+        config: ConfigSchema
+        auth: any
+    }
 }
 
 const main = async () => {
-  const f = fastify({
-    logger: true
-  });
+    const server = fastify({
+        logger: true
+    });
 
-  f.log.info("Setting up plugins");
-  await f.register(Env, { schema: ConfigSchema, dotenv: true });
-  f.register(databasePlugin);
-  f.register(fastifyJwt, {
-    secret: f.config.JWT_SECRET
-  })
-  if (f.config.NODE_ENV !== "production") {
-    f.register(swagger);
-  }
+    server.log.info("Setting up plugins");
+    await server.register(Env, { schema: ConfigSchema, dotenv: true });
+    server.register(databasePlugin);
+    server.register(fastifyJwt, {
+        secret: server.config.JWT_SECRET
+    });
+    server.decorate('auth', async (request: FastifyRequest, response: FastifyReply) => {
+        const token = request.headers.authorization
 
-  f.log.info("Registering routes");
-  await f.register(AutoLoad, {
-    dir: join(import.meta.url, "routes"),
-    dirNameRoutePrefix: true,
-  });
+        if (token) {
+            const payload = server.jwt.verify<FastifyJWT['user']>(token.replace("Bearer ", ""))
+            request.user = payload
+        } else {
+            return response.code(401).send({ message: 'auth_required' })
+        }
+    })
+
+    if (server.config.NODE_ENV !== "production") {
+        server.register(swagger);
+    }
+
+    server.log.info("Registering routes");
+    await server.register(AutoLoad, {
+        dir: join(import.meta.url, "routes"),
+        dirNameRoutePrefix: true,
+    });
 
 
-  f.log.info("Listening on port "+f.config.PORT);
-  await f.listen({ port: f.config.PORT });
+    server.log.info("Listening on port " + server.config.PORT);
+    await server.listen({ port: server.config.PORT });
 };
 
 await main();
