@@ -1,3 +1,4 @@
+import { Language } from "@blog/schemas/cemise.js";
 import { randomUUID } from "crypto";
 import { relations, sql } from "drizzle-orm";
 import {
@@ -7,8 +8,7 @@ import {
     primaryKey,
 } from "drizzle-orm/sqlite-core";
 
-export const post = sqliteTable(
-    "posts",
+export const post = sqliteTable("posts",
     {
         id: text("id").$defaultFn(() => randomUUID()),
         hidden: integer("hidden", { mode: "boolean" }),
@@ -46,7 +46,7 @@ export const tag = sqliteTable(
     "tags",
     {
         id: text("id").$defaultFn(() => randomUUID()),
-        language: text("language", { enum: ["en", "pt"] }).notNull(),
+        language: text("language", { enum: ["EN", "PT"] }).notNull().$type<Language>(),
         title: text("title").notNull(),
         tagline: text("tagline").notNull(),
     },

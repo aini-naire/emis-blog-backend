@@ -1,4 +1,4 @@
-import { User, NewUser } from "@blog/schemas/cemise.js";
+import { CreateUserRequest, UserResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -13,23 +13,35 @@ export default async function userRoutes(fastify: FastifyInstance) {
             response: {
                 200: {
                     type: "array",
-                    items: User,
+                    items: UserResponse,
                 },
             },
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            console.log(await CemiseService.listUsers());
             response.send(await CemiseService.listUsers());
+        },
+    });
+
+    server.get("/users/me", {
+        schema: {
+            tags: ["CEMISE USERS"],
+            response: {
+                200: UserResponse,
+            },
+            security: [{ "CemiseAuth": [] }]
+        },
+        handler: async (request, response) => {
+            response.send(<UserResponse>request.user);
         },
     });
 
     server.post("/users", {
         schema: {
             tags: ["CEMISE USERS"],
-            body: NewUser,
+            body: CreateUserRequest,
             response: {
-                200: User,
+                200: UserResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },

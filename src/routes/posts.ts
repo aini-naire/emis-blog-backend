@@ -1,4 +1,4 @@
-import { Error, NewPost, Post } from "@blog/schemas/cemise.js";
+import { ErrorResponse, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import BlogService from "@blog/services/blog.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -17,10 +17,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
                 }
             },
             response: {
-                200: {
-                    type: "array",
-                    items: Post,
-                },
+                200: PostsResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
@@ -34,11 +31,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
         schema: {
             tags: ["PUBLIC"],
             response: {
-                200: {
-                    type: "array",
-                    items: Post,
-                },
-                404: Error,
+                200: PostResponse,
+                404: ErrorResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },

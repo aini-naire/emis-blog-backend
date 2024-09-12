@@ -6,6 +6,7 @@ import { join } from "desm";
 import { databasePlugin } from "@blog/plugins/database.js";
 import swagger from "@blog/plugins/swagger.js";
 import { FastifyJWT, JWT, fastifyJwt } from "@fastify/jwt";
+import cors from '@fastify/cors'
 import { Static, Type } from "@fastify/type-provider-typebox";
 import { User } from "./schemas/cemise.js";
 
@@ -30,6 +31,9 @@ const main = async () => {
     });
 
     server.log.info("Setting up plugins");
+    await server.register(cors, { 
+      origin: "*"
+    })
     await server.register(Env, { schema: ConfigSchema, dotenv: true });
     server.register(databasePlugin);
     server.register(fastifyJwt, {

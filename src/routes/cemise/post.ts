@@ -1,4 +1,4 @@
-import { Error, NewPost, Post } from "@blog/schemas/cemise.js";
+import { CreatePostRequest, ErrorResponse, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -11,10 +11,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         schema: {
             tags: ["CEMISE POSTS"],
             response: {
-                200: {
-                    type: "array",
-                    items: Post,
-                },
+                200: PostsResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
@@ -26,16 +23,16 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.post("/posts", {
         schema: {
             tags: ["CEMISE POSTS"],
-            body: NewPost,
+            body: CreatePostRequest,
             response: {
-                201: Post,
+                201: PostResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const post: NewPost = request.body;
+            const post: CreatePostRequest = request.body;
             const ns = await CemiseService.addPost(post, request.user);
-            response.status(201).send(ns[0]);
+            response.status(201).send(ns);
         },
     });
 
@@ -43,11 +40,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
         schema: {
             tags: ["CEMISE POSTS"],
             response: {
-                200: {
-                    type: "array",
-                    items: Post,
-                },
-                404: Error,
+                200: PostResponse,
+                404: ErrorResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
@@ -56,7 +50,9 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const posts = await CemiseService.getPost(postId);
 
             if (posts.length) {
-                response.send(posts);
+                const resp: PostResponse = {};
+                posts.forEach((post) => resp[post.language] = post);
+                response.send(resp);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
@@ -66,23 +62,20 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.put("/posts/:postId", {
         schema: {
             tags: ["CEMISE POSTS"],
-            body: NewPost,
+            body: CreatePostRequest,
             response: {
-                200: {
-                    type: "array",
-                    items: Post,
-                },
-                404: Error,
+                200: PostResponse,
+                404: ErrorResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
             const { postId } = request.params;
-            const postData: NewPost = request.body;
+            const postData: CreatePostRequest = request.body;
             const post = await CemiseService.updatePost(postData, postId);
 
-            if (post.length) {
-                response.send(post[0]);
+            if (Object.keys(post).length) {
+                response.send(post);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }

@@ -1,28 +1,72 @@
 import { Post, post, tag, User, users } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
-import { Tag, UserCredentials } from "@blog/schemas/cemise.js";
+import { CreatePostRequest, CreateTagRequest, EnumLanguage, PostBase, Tag, TagResponse } from "@blog/schemas/cemise.js";
 import * as bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 
 export default {
-    addTag: async function (tagData: Tag, user: User): Promise<Tag[]> {
-        return database.insert(tag).values(tagData).returning();
+    addTag: async function (tagData: CreateTagRequest, user: User): Promise<Record<string, Tag>> {
+        const uuid = randomUUID();
+        
+        return database.transaction(async (tx) => {
+            let k: keyof CreateTagRequest;
+            let response: Record<string, Tag> = {};
+            for (k in tagData) {
+                let record: Tag = tagData[k]
+                record.id = uuid;
+                record.language = EnumLanguage[k];
+                let result: Tag[] = await database.insert(tag).values(record).returning()
+                response[k] =  result[0];
+            }
+            return response;
+          });
     },
 
     listTags: async function (): Promise<Tag[]> {
         return database.query.tag.findMany().execute();
     },
 
-    getTag: async function (id: string): Promise<Post[]> {
+    getTag: async function (id: string): Promise<Tag[]> {
         return database.query.tag.findMany({ where: (tag, { eq }) => (eq(tag.id, id)) }).execute();
     },
 
-    updateTag: async function (tagData: Post, id: string): Promise<Post[]> {
+    updateTag: async function (tagData: CreateTagRequest, id: string): Promise<Record<string, Tag>> {
+        return database.transaction(async (tx) => {
+            let k: keyof CreateTagRequest;
+            let response: Record<string, Tag> = {};
+            for (k in tagData) {
+                let record: Tag = tagData[k]
+                record.id = id;
+                record.language = EnumLanguage[k];
+                let result: Tag[] = await database.update(tag).set(record).where(and(eq(tag.id, id), eq(tag.language, record.language))).returning();
+                response[k] =  result[0];
+            }
+            return response;
+          });
         return database.update(tag).set(tagData).where(and(eq(tag.id, id), eq(tag.language, tagData.language))).returning();
     },
 
-    addPost: async function (postData: Post, user: User): Promise<Post[]> {
-        postData.authorId = user.id;
+    addPost: async function (postData: CreatePostRequest, user: User): Promise<Record<string, PostBase>> {
+        const uuid = randomUUID();
+        
+        return database.transaction(async (tx) => {
+            let k: keyof CreatePostRequest['content'];
+            let response: Record<string, PostBase> = {};
+            for (k in postData.content) {
+                let record: Post = postData.content[k]
+                record.id = uuid;
+                record.authorId = user.id;
+                record.language = EnumLanguage[k];
+                record.hidden = postData.hidden;
+                record.showAuthor = postData.showAuthor;
+                //TODO tags
+                let result: PostBase[] = await database.insert(post).values(record).returning()
+                response[k] = result[0];
+                response[k].author = user;
+            }
+            return response;
+          });
         return database.insert(post).values(postData).returning();
     },
 
@@ -34,7 +78,24 @@ export default {
         return database.query.post.findMany({ where: (post, { eq }) => (eq(post.id, id)), with: { author: true } }).execute();
     },
 
-    updatePost: async function (postData: Post, id: string): Promise<Post[]> {
+    updatePost: async function (postData: CreatePostRequest, id: string): Promise<Post[]> {
+        return database.transaction(async (tx) => {
+            let k: keyof CreatePostRequest['content'];
+            let response: Record<string, PostBase> = {};
+            for (k in postData.content) {
+                let record: Post = postData.content[k]
+                record.id = id;
+                record.authorId = user.id;
+                record.language = EnumLanguage[k];
+                record.hidden = postData.hidden;
+                record.showAuthor = postData.showAuthor;
+                //TODO tags
+                let result: Post[] = await database.update(post).set(record).where(and(eq(post.id, id), eq(post.language, record.language))).returning();
+                response[k] = <PostBase>result[0];
+                response[k].author.fullName = "none"; // Really need to refractor this
+            }
+            return response;
+          });
         return database.update(post).set(postData).where(and(eq(post.id, id), eq(post.language, postData.language))).returning();
     },
 
