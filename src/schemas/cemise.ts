@@ -1,15 +1,15 @@
 import { Type, Static } from '@sinclair/typebox'
 
 export enum EnumLanguage {
-    EN = "EN",
-    PT = "PT"
+    EN = 'EN',
+    PT = 'PT'
 }
 
 export type Language = Static<typeof Language>
-const Language = Type.Enum(EnumLanguage)
+export const Language = Type.Enum(EnumLanguage)
 
-type Author = Static<typeof Author>
-const Author = Type.Object({
+export type Author = Static<typeof Author>
+export const Author = Type.Object({
     fullName: Type.String()
 })
 
@@ -34,7 +34,7 @@ export type TagResponse = Static<typeof TagResponse>
 export const TagResponse = Type.Record(Language, Tag)
 
 export type TagsResponse = Static<typeof TagsResponse>
-export const TagsResponse = Type.Record(Type.String({ type: 'uuid' }), TagResponse)
+export const TagsResponse = Type.Record(Type.String(), TagResponse)
 
 export type PostBase = Static<typeof PostBase>
 export const PostBase = Type.Object({
@@ -63,17 +63,17 @@ export const NewPost = Type.Object({
 
 export type CreatePostRequest = Static<typeof CreatePostRequest>
 export const CreatePostRequest = Type.Object({
-    content: Type.Record(Language, NewPost),
+    content: Type.Partial(Type.Record(Language, NewPost), { minProperties: 1 }),
     hidden: Type.Boolean(),
     showAuthor: Type.Boolean(),
-    tags: Type.Array(Tag)
+    tags: Type.Array(Type.String())
 })
 
 export type PostResponse = Static<typeof PostResponse>
-export const PostResponse = Type.Record(Language, PostBase)
+export const PostResponse = Type.Partial(Type.Record(Language, PostBase))
 
 export type PostsResponse = Static<typeof PostsResponse>
-export const PostsResponse = Type.Record(Type.String({ type: 'uuid' }), PostResponse)
+export const PostsResponse = Type.Record(Type.String(), PostResponse)
 
 export type CreateUserRequest = Static<typeof CreateUserRequest>
 export const CreateUserRequest = Type.Object({

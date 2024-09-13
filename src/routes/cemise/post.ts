@@ -16,7 +16,14 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            response.send(await CemiseService.listPosts());
+            
+            const posts = await CemiseService.listPosts();
+            const resp: PostsResponse = {};
+            posts.forEach((post) => {
+                if (!(post.id in resp)) resp[post.id] = {};
+                resp[post.id][post.language] = post;
+            })
+            response.send(resp);
         },
     });
 
