@@ -39,7 +39,7 @@ export const postRelations = relations(post, ({ many, one }) => ({
 export const postTags = sqliteTable("post_tags", {
     postid: text("post_id").references(() => post.id),
     tagid: text("tag_id").references(() => tag.id),
-    language: text("language", { enum: ["en", "pt"] }),
+    language: text("language", { enum: ["EN", "PT"] }),
 });
 
 export const tag = sqliteTable(
@@ -85,3 +85,4 @@ export const users = sqliteTable("users", {
 export type Post = typeof post.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Tag = typeof tag.$inferSelect;
+export type PostTag = typeof postTags.$inferSelect;

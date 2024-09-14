@@ -50,7 +50,7 @@ export const PostBase = Type.Object({
     modified: Type.String({ type: 'date' }),
     showAuthor: Type.Boolean(),
     author: Author,
-    tags: Type.Optional(Type.Array(Tag))
+    tags: Type.Array(Tag)
 })
 
 export type NewPost = Static<typeof NewPost>

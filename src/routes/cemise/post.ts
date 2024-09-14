@@ -1,4 +1,5 @@
-import { CreatePostRequest, ErrorResponse, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
+import { Post, PostTag } from "@blog/database/schema.js";
+import { CreatePostRequest, ErrorResponse, PostBase, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -6,6 +7,30 @@ import type { FastifyInstance } from "fastify";
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
     server.addHook("onRequest", server.auth);
+
+    const serializePostBase = function (post: Post) {
+        let postResp: PostBase = post;
+        postResp.tags = [];
+        let tag: PostTag;
+        post.postTags.forEach((tag) => {
+            postResp.tags.push(tag.tag)
+        });
+        return postResp;
+    }
+
+    const serializePost = function (posts: Post[]) {
+        const resp: PostResponse = {};
+        posts.forEach((post) => resp[post.language] = serializePostBase(post));
+        return resp;
+    }
+    const serializePosts = function (posts: Post[]) {
+        const resp: PostsResponse = {};
+        posts.forEach((post) => {
+            if (!(post.id in resp)) resp[post.id] = {};
+            resp[post.id][post.language] = serializePostBase(post)
+        })
+        return resp;
+    }
 
     server.get("/posts", {
         schema: {
@@ -16,14 +41,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            
             const posts = await CemiseService.listPosts();
-            const resp: PostsResponse = {};
-            posts.forEach((post) => {
-                if (!(post.id in resp)) resp[post.id] = {};
-                resp[post.id][post.language] = post;
-            })
-            response.send(resp);
+            response.send(serializePosts(posts));
         },
     });
 
@@ -39,7 +58,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const post: CreatePostRequest = request.body;
             const ns = await CemiseService.addPost(post, request.user);
-            response.status(201).send(ns);
+            response.status(201).send(serializePost(ns));
         },
     });
 
@@ -57,9 +76,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const posts = await CemiseService.getPost(postId);
 
             if (posts.length) {
-                const resp: PostResponse = {};
-                posts.forEach((post) => resp[post.language] = post);
-                response.send(resp);
+                response.send(serializePost(posts));
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
@@ -79,10 +96,10 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { postId } = request.params;
             const postData: CreatePostRequest = request.body;
-            const post = await CemiseService.updatePost(postData, postId, request.user);
+            const post = await CemiseService.updatePost(postData, postId);
 
             if (Object.keys(post).length) {
-                response.send(post);
+                response.send(serializePost(post));
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
