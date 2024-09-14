@@ -1,5 +1,6 @@
-import { CreateTagRequest, ErrorResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
+import { CreateTagRequest, ErrorResponse, PostsResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
+import { serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -84,6 +85,28 @@ export default async function tagRoutes(fastify: FastifyInstance) {
                 response.send(tag);
             } else {
                 response.status(404).send({ message: "tag_not_found" });
+            }
+        },
+    });
+
+    server.get("/tags/:tagId/posts", {
+        schema: {
+            tags: ["CEMISE TAGS"],
+            response: {
+                200: PostsResponse,
+                404: ErrorResponse,
+            },
+            security: [{ "CemiseAuth": [] }]
+        },
+        handler: async (request, response) => {
+            const { tagId } = request.params;
+            const posts = await CemiseService.listPostsForTag(tagId);
+            console.log(posts)
+
+            if (posts.length) {
+                response.send(serializePosts(posts.map((post) => post.post)));
+            } else {
+                response.send([]);
             }
         },
     });

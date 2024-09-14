@@ -73,6 +73,13 @@ export default {
         return database.query.post.findMany({ with: { author: true, postTags: { with: { tag: true } } } }).execute();
     },
 
+    listPostsForTag: async function (tagID: string): Promise<PostTag[]> {
+        return database.query.postTags.findMany({
+            where: (postTag, { eq }) => eq(postTag.tagid, tagID),
+            with: { post: { with: { author: true, postTags: { with: { tag: true } } } } }
+        }).execute();
+    },
+
     getPost: async function (id: string): Promise<Post[]> {
         return database.query.post.findMany({
             where: (post, { eq }) => (eq(post.id, id)),

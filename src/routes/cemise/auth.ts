@@ -1,4 +1,4 @@
-import { ErrorResponse, LoginRequest } from "@blog/schemas/cemise.js";
+import { ErrorResponse, LoginRequest, LoginResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -11,7 +11,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             tags: ["CEMISE USERS"],
             body: LoginRequest,
             response: {
-                200: LoginRequest,
+                200: LoginResponse,
                 401: ErrorResponse,
             },
         },
