@@ -58,14 +58,14 @@ export const NewPost = Type.Object({
     url: Type.String(),
     content: Type.String(),
     title: Type.String(),
-    tagline: Type.String()
+    tagline: Type.String(),
+    hidden: Type.Boolean(),
+    showAuthor: Type.Boolean()
 })
 
 export type CreatePostRequest = Static<typeof CreatePostRequest>
 export const CreatePostRequest = Type.Object({
     content: Type.Partial(Type.Record(Language, NewPost), { minProperties: 1 }),
-    hidden: Type.Boolean(),
-    showAuthor: Type.Boolean(),
     tags: Type.Array(Type.String())
 })
 

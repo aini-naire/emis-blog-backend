@@ -58,8 +58,6 @@ export default {
                 record.id = uuid;
                 record.authorId = user.id;
                 record.language = EnumLanguage[k];
-                record.hidden = postData.hidden;
-                record.showAuthor = postData.showAuthor;
                 //TODO tags
                 let result: PostBase[] = await database.insert(post).values(record).returning()
                 response[k] = result[0];
@@ -78,7 +76,7 @@ export default {
         return database.query.post.findMany({ where: (post, { eq }) => (eq(post.id, id)), with: { author: true } }).execute();
     },
 
-    updatePost: async function (postData: CreatePostRequest, id: string): Promise<Post[]> {
+    updatePost: async function (postData: CreatePostRequest, id: string, user: User): Promise<Post[]> {
         return database.transaction(async (tx) => {
             let k: keyof CreatePostRequest['content'];
             let response: Record<string, PostBase> = {};
@@ -87,11 +85,10 @@ export default {
                 record.id = id;
                 record.authorId = user.id;
                 record.language = EnumLanguage[k];
-                record.hidden = postData.hidden;
-                record.showAuthor = postData.showAuthor;
                 //TODO tags
                 let result: Post[] = await database.update(post).set(record).where(and(eq(post.id, id), eq(post.language, record.language))).returning();
                 response[k] = <PostBase>result[0];
+                response[k].author = {}; // Really need to refractor this
                 response[k].author.fullName = "none"; // Really need to refractor this
             }
             return response;

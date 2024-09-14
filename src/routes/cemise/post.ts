@@ -79,7 +79,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { postId } = request.params;
             const postData: CreatePostRequest = request.body;
-            const post = await CemiseService.updatePost(postData, postId);
+            const post = await CemiseService.updatePost(postData, postId, request.user);
 
             if (Object.keys(post).length) {
                 response.send(post);
