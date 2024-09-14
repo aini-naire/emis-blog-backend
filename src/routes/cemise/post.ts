@@ -1,36 +1,14 @@
 import { Post, PostTag } from "@blog/database/schema.js";
 import { CreatePostRequest, ErrorResponse, PostBase, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
+import { serializePost, serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
+
 
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
     server.addHook("onRequest", server.auth);
-
-    const serializePostBase = function (post: Post) {
-        let postResp: PostBase = post;
-        postResp.tags = [];
-        let tag: PostTag;
-        post.postTags.forEach((tag) => {
-            postResp.tags.push(tag.tag)
-        });
-        return postResp;
-    }
-
-    const serializePost = function (posts: Post[]) {
-        const resp: PostResponse = {};
-        posts.forEach((post) => resp[post.language] = serializePostBase(post));
-        return resp;
-    }
-    const serializePosts = function (posts: Post[]) {
-        const resp: PostsResponse = {};
-        posts.forEach((post) => {
-            if (!(post.id in resp)) resp[post.id] = {};
-            resp[post.id][post.language] = serializePostBase(post)
-        })
-        return resp;
-    }
 
     server.get("/posts", {
         schema: {
