@@ -14,7 +14,10 @@ type ConfigSchema = Static<typeof ConfigSchema>
 const ConfigSchema = Type.Object({
     NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production')]),
     PORT: Type.Number(),
-    JWT_SECRET: Type.String()
+    JWT_SECRET: Type.String(),
+    CEMISE_URL: Type.String(),
+    BLOG_URL: Type.String(),
+    HOST: Type.String(),
 })
 
 declare module "fastify" {
@@ -31,8 +34,15 @@ const main = async () => {
     });
 
     server.log.info("Setting up plugins");
-    await server.register(cors, { 
-      origin: "*"
+    await server.register(cors, {
+        origin: (origin, cb) => {
+            const hostname = new URL(origin).hostname
+            if (hostname === "localhost") {
+                cb(null, true)
+                return
+            }
+            cb(new Error("Not allowed"), false)
+        }
     })
     await server.register(Env, { schema: ConfigSchema, dotenv: true });
     server.register(databasePlugin);
@@ -43,7 +53,7 @@ const main = async () => {
         const token = request.headers.authorization
 
         if (token) {
-            const payload:User = server.jwt.verify<FastifyJWT['user']>(token.replace("Bearer ", ""))
+            const payload: User = server.jwt.verify<FastifyJWT['user']>(token.replace("Bearer ", ""))
             request.user = payload
         } else {
             return response.code(401).send({ message: 'auth_required' })
@@ -62,7 +72,7 @@ const main = async () => {
 
 
     server.log.info("Listening on port " + server.config.PORT);
-    await server.listen({ port: server.config.PORT });
+    await server.listen({ host: server.config.HOST, port: server.config.PORT });
 };
 
 await main();
