@@ -23,6 +23,8 @@ export const post = sqliteTable("posts",
         tagline: text("tagline").notNull(),
         content: text("content").notNull(),
         showAuthor: integer("showAuthor", { mode: "boolean" }),
+        page: integer("page", { mode: "boolean" }),
+        private: integer("private", { mode: "boolean" }),
     },
     (table) => {
         return {
@@ -80,6 +82,17 @@ export const users = sqliteTable("users", {
     password: text("password"),
     email: text("email"),
     fullName: text("full_name"),
+});
+
+export const nav = sqliteTable("nav", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => randomUUID()),
+    language: text("language", { enum: ["EN", "PT"] }).notNull().$type<Language>(),
+    url: text("url"),
+    text: text("text"),
+    enabled: integer("enabled", { mode: "boolean" }),
+    order: integer("order"),
 });
 
 export type Post = typeof post.$inferSelect;
