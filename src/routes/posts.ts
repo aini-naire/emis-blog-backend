@@ -1,4 +1,4 @@
-import { ErrorResponse, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
+import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
 import BlogService from "@blog/services/blog.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -6,7 +6,7 @@ import type { FastifyInstance } from "fastify";
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
-    server.get("/posts", {
+    server.get("/posts/:language", {
         schema: {
             tags: ["PUBLIC"],
             querystring: {
@@ -17,21 +17,22 @@ export default async function postRoutes(fastify: FastifyInstance) {
                 }
             },
             response: {
-                200: PostsResponse,
+                200: PostListResponse,
             },
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const {page, results} = request.query;
-            response.send(await BlogService.listPosts(page, results));
+            const { language } = request.params;
+            const { page, results } = request.query;
+            response.send(await BlogService.listPosts(language, page, results));
         },
     });
 
-    server.get("/posts/:postIdOrUrl", {
+    server.get("/post/:postIdOrUrl", {
         schema: {
             tags: ["PUBLIC"],
             response: {
-                200: PostResponse,
+                200: PostBase,
                 404: ErrorResponse,
             },
             security: [{ "CemiseAuth": [] }]
@@ -41,7 +42,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const posts = await BlogService.getPost(postIdOrUrl);
 
             if (posts.length) {
-                response.send(posts);
+                response.send(posts[0]);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }

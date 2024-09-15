@@ -35,14 +35,7 @@ const main = async () => {
 
     server.log.info("Setting up plugins");
     await server.register(cors, {
-        origin: (origin, cb) => {
-            const hostname = new URL(origin).hostname
-            if (hostname === "localhost") {
-                cb(null, true)
-                return
-            }
-            cb(new Error("Not allowed"), false)
-        }
+        origin: "*"
     })
     await server.register(Env, { schema: ConfigSchema, dotenv: true });
     server.register(databasePlugin);
