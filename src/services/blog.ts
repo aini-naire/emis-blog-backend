@@ -1,7 +1,7 @@
-import { Post } from "@blog/database/schema.js";
+import { post, Post } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
 import { Language, Tag } from "@blog/schemas/cemise.js";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 
 export default {
     listTags: async function (): Promise<Tag[]> {
@@ -12,13 +12,17 @@ export default {
         return database.query.tag.findMany({ where: (tag, { eq }) => (eq(tag.id, id)) }).execute();
     },
 
-    listPosts: async function (language: Language, page: number = 1, results: number = 10): Promise<Post[]> {
-        return database.query.post.findMany({
+    listPosts: function (language: Language, page: number = 1, results: number = 10) {
+        return [database.query.post.findMany({
+            columns: {
+                content: false
+            },
             offset: (page - 1) * results,
             limit: results,
             where: (post, { eq, and }) => and(eq(post.hidden, false), eq(post.language, language)),
             with: { author: true }
-        }).execute();
+        }).execute(),
+         database.select({posts: count()}).from(post).where(and(eq(post.hidden, false), eq(post.language, language))).execute()];
     },
 
     getPost: async function (id: string): Promise<Post[]> {

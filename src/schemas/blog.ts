@@ -32,7 +32,11 @@ export const PostMeta = Type.Object({
 })
 
 export type PostListResponse = Static<typeof PostListResponse>
-export const PostListResponse = Type.Array(PostMeta)
+export const PostListResponse = Type.Object({
+  posts: Type.Array(PostMeta),
+  page: Type.Number(),
+  pages: Type.Number()
+})
 
 export type PostBase = Static<typeof PostBase>
 export const PostBase = Type.Object({

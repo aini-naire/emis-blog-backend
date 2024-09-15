@@ -24,7 +24,10 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { language } = request.params;
             const { page, results } = request.query;
-            response.send(await BlogService.listPosts(language, page, results));
+            console.log(BlogService.listPosts(language, page, results))
+            await Promise.all(BlogService.listPosts(language, page, results)).then(([posts, count]) => {
+                response.send(<PostListResponse>{ posts: posts, pages: Math.ceil(count[0].posts / (results ? results : 10) ), page: page ? page : 1 });
+            })
         },
     });
 
