@@ -1,5 +1,5 @@
 import { ErrorResponse, LoginRequest, LoginResponse } from "@blog/schemas/cemise.js";
-import CemiseService from "@blog/services/cemise.js";
+import { AuthService } from "@blog/services/cemise/auth.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -17,7 +17,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const credentials: LoginRequest = request.body;
-            const user = await CemiseService.login(credentials);
+            const user = await AuthService.login(credentials);
             if (user) {
                 const token = fastify.jwt.sign(user as User)
                 return { accessToken: token };

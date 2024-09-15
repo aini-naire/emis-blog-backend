@@ -1,5 +1,7 @@
 import { CreateTagRequest, ErrorResponse, PostsResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
 import CemiseService from "@blog/services/cemise.js";
+import { PostService } from "@blog/services/cemise/post.js";
+import { TagService } from "@blog/services/cemise/tag.js";
 import { serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -15,7 +17,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const tags = await CemiseService.listTags();
+            const tags = await TagService.list();
             const resp: TagsResponse = {};
             tags.forEach((tag) => {
                 if (!(tag.id in resp)) resp[tag.id] = {};
@@ -36,7 +38,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const tag: CreateTagRequest = request.body;
-            const addedTag = await CemiseService.addTag(tag, request.user);
+            const addedTag = await TagService.add(tag, request.user);
             response.status(201).send(addedTag);
         },
     });
@@ -52,7 +54,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { tagId } = request.params;
-            const tags = await CemiseService.getTag(tagId);
+            const tags = await TagService.get(tagId);
 
             if (tags.length) {
                 const resp: TagResponse = {};
@@ -79,7 +81,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { tagId } = request.params;
             const tagData: CreateTagRequest = request.body;
-            const tag = await CemiseService.updateTag(tagData, tagId);
+            const tag = await TagService.update(tagData, tagId);
 
             if (Object.keys(tag).length) {
                 response.send(tag);
@@ -100,7 +102,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { tagId } = request.params;
-            const posts = await CemiseService.listPostsForTag(tagId);
+            const posts = await PostService.listByTag(tagId);
             console.log(posts)
 
             if (posts.length) {

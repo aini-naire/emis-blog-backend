@@ -1,6 +1,6 @@
 import { Post, PostTag } from "@blog/database/schema.js";
 import { CreatePostRequest, ErrorResponse, PostBase, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
-import CemiseService from "@blog/services/cemise.js";
+import { PostService } from "@blog/services/cemise/post.js";
 import { serializePost, serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -19,7 +19,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const posts = await CemiseService.listPosts();
+            const posts = await PostService.list();
             response.send(serializePosts(posts));
         },
     });
@@ -35,7 +35,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const post: CreatePostRequest = request.body;
-            const ns = await CemiseService.addPost(post, request.user);
+            const ns = await PostService.add(post, request.user);
             response.status(201).send(serializePost(ns));
         },
     });
@@ -51,7 +51,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { postId } = request.params;
-            const posts = await CemiseService.getPost(postId);
+            const posts = await PostService.get(postId);
 
             if (posts.length) {
                 response.send(serializePost(posts));
@@ -74,7 +74,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { postId } = request.params;
             const postData: CreatePostRequest = request.body;
-            const post = await CemiseService.updatePost(postData, postId);
+            const post = await PostService.update(postData, postId);
 
             if (Object.keys(post).length) {
                 response.send(serializePost(post));

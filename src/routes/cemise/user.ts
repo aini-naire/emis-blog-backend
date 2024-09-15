@@ -1,5 +1,5 @@
 import { CreateUserRequest, UserResponse } from "@blog/schemas/cemise.js";
-import CemiseService from "@blog/services/cemise.js";
+import { UserService } from "@blog/services/cemise/user.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -19,7 +19,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            response.send(await CemiseService.listUsers());
+            response.send(await UserService.list());
         },
     });
 
@@ -47,7 +47,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const userData: NewUser = request.body;
-            const ns = await CemiseService.addUser(userData);
+            const ns = await UserService.add(userData);
             return ns[0];
         },
     });
