@@ -49,6 +49,7 @@ export const PostBase = Type.Object({
   created: Type.String({ type: 'date' }),
   modified: Type.String({ type: 'date' }),
   showAuthor: Type.Boolean(),
+  page: Type.Boolean(),
   author: Author,
   tags: Type.Optional(Type.Array(Tag))
 })

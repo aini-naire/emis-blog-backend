@@ -13,6 +13,33 @@ export const Author = Type.Object({
     fullName: Type.String()
 })
 
+export type Nav = Static<typeof Nav>
+export const Nav = Type.Object({
+    id: Type.String({ type: 'uuid' }),
+    text: Type.String(),
+    language: Language,
+    url: Type.String(),
+    enabled: Type.Boolean(),
+    order: Type.Number()
+})
+
+export type NewNav = Static<typeof NewNav>
+export const NewNav = Type.Object({
+    text: Type.String(),
+    url: Type.String(),
+    enabled: Type.Boolean(),
+    order: Type.Number()
+})
+
+export type CreateNavRequest = Static<typeof CreateNavRequest>
+export const CreateNavRequest = Type.Record(Language, NewNav)
+
+export type NavResponse = Static<typeof NavResponse>
+export const NavResponse = Type.Record(Language, Nav)
+
+export type NavsResponse = Static<typeof NavsResponse>
+export const NavsResponse = Type.Record(Type.String(), NavResponse)
+
 export type Tag = Static<typeof Tag>
 export const Tag = Type.Object({
     id: Type.String({ type: 'uuid' }),
@@ -49,8 +76,10 @@ export const PostBase = Type.Object({
     created: Type.String({ type: 'date' }),
     modified: Type.String({ type: 'date' }),
     showAuthor: Type.Boolean(),
+    private: Type.Boolean(),
+    page: Type.Boolean(),
     author: Author,
-    tags: Type.Array(Tag)
+    tags: Type.Optional(Type.Array(Tag))
 })
 
 export type NewPost = Static<typeof NewPost>
@@ -60,7 +89,9 @@ export const NewPost = Type.Object({
     title: Type.String(),
     tagline: Type.String(),
     hidden: Type.Boolean(),
-    showAuthor: Type.Boolean()
+    showAuthor: Type.Boolean(),
+    private: Type.Boolean(),
+    page: Type.Boolean()
 })
 
 export type CreatePostRequest = Static<typeof CreatePostRequest>

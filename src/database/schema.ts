@@ -86,16 +86,21 @@ export const users = sqliteTable("users", {
 
 export const nav = sqliteTable("nav", {
     id: text("id")
-        .primaryKey()
         .$defaultFn(() => randomUUID()),
     language: text("language", { enum: ["EN", "PT"] }).notNull().$type<Language>(),
     url: text("url"),
     text: text("text"),
     enabled: integer("enabled", { mode: "boolean" }),
     order: integer("order"),
-});
+},
+    (table) => {
+        return {
+            pk: primaryKey({ columns: [table.id, table.language] }),
+        };
+    });
 
 export type Post = typeof post.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type Tag = typeof tag.$inferSelect;
 export type PostTag = typeof postTags.$inferSelect;
+export type Nav = typeof nav.$inferSelect;
