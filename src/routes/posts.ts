@@ -18,8 +18,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             },
             response: {
                 200: PostListResponse,
-            },
-            security: [{ "CemiseAuth": [] }]
+            }
         },
         handler: async (request, response) => {
             const { language } = request.params;

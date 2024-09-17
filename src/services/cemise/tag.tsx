@@ -36,6 +36,7 @@ export const TagService = {
             let response: Record<string, Tag> = {};
             for (k in tagData) {
                 let record: Partial<Tag> = tagData[k]
+                record.language = EnumLanguage[k];
                 let result: Tag[] = await database.update(tag).set(record).where(and(eq(tag.id, id), eq(tag.language, record.language))).returning();
                 response[k] = result[0];
             }

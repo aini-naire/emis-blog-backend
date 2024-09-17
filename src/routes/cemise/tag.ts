@@ -1,5 +1,4 @@
 import { CreateTagRequest, ErrorResponse, PostsResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
-import CemiseService from "@blog/services/cemise.js";
 import { PostService } from "@blog/services/cemise/post.js";
 import { TagService } from "@blog/services/cemise/tag.js";
 import { serializePosts } from "@blog/util/post.js";

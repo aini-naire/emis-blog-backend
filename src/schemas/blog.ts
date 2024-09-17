@@ -5,6 +5,15 @@ export enum EnumLanguage {
   PT = 'PT'
 }
 
+export type Nav = Static<typeof Nav>
+export const Nav = Type.Object({
+  text: Type.String(),
+  url: Type.String()
+})
+
+export type NavResponse = Static<typeof NavResponse>
+export const NavResponse = Type.Array(Nav)
+
 export type Language = Static<typeof Language>
 export const Language = Type.Enum(EnumLanguage)
 

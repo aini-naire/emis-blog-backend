@@ -1,7 +1,7 @@
-import { post, Post } from "@blog/database/schema.js";
+import { nav, post, Post } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
 import { Language, Tag } from "@blog/schemas/cemise.js";
-import { and, count, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 
 export default {
     listTags: async function (): Promise<Tag[]> {
@@ -23,6 +23,10 @@ export default {
             with: { author: true }
         }).execute(),
          database.select({posts: count()}).from(post).where(and(eq(post.hidden, false), eq(post.language, language))).execute()];
+    },
+
+    getNav: async function (language: Language) {
+        return database.select().from(nav).where(and(eq(nav.enabled, true), eq(nav.language, language))).orderBy(asc(nav.order));
     },
 
     getPost: async function (id: string): Promise<Post[]> {
