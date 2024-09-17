@@ -27,7 +27,7 @@ export const PostService = {
             })
             return true;
         });
-        if (insertTx) return this.getPost(uuid);
+        if (insertTx) return this.get(uuid);
     },
 
     list: async function (): Promise<Post[]> {
@@ -60,6 +60,6 @@ export const PostService = {
             }
             return true;
         });
-        if (updateTx) return this.getPost(id);
+        if (updateTx) return this.get(id);
     },
 }
