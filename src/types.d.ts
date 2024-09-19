@@ -3,6 +3,13 @@ export enum Language {
     EN = "EN",
     PT = "PT",
   }
+
+  export type Nav = {
+    text: string;
+    url: string;
+  }
+
+  export type NavResponse = Nav[];
   
   export type Author = {
     fullName: string;
@@ -50,6 +57,8 @@ export enum Language {
        */
       modified: string;
       showAuthor: boolean;
+      private: boolean;
+      page: boolean;
       author: Author,
       tags?: Tag[];
   }
@@ -61,6 +70,8 @@ export enum Language {
       tagline: string;
       hidden: boolean;
       showAuthor: boolean;
+      private: boolean;
+      page: boolean;
   }
   
   export type CreatePostRequest = {
@@ -110,3 +121,4 @@ export enum Language {
   export type ErrorResponse = {
     message: string;
   }
+  

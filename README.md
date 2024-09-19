@@ -3,7 +3,7 @@
 #### Functionality:
  - [ ] handle existing post tags removal/add
  - [ ] rpi optimization
- - [ ] improve services return consistency
+ - [x] improve services return consistency
  - [ ] deploytool logging
  - [ ] error handling
  - [ ] cors and cache control

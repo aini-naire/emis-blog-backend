@@ -1,8 +1,5 @@
-import { CreateNavRequest, CreateTagRequest, ErrorResponse, NavResponse, NavsResponse, PostsResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
+import { CreateNavRequest, ErrorResponse, NavResponse, NavsResponse } from "@blog/schemas/cemise.js";
 import { NavService } from "@blog/services/cemise/nav.js";
-import { PostService } from "@blog/services/cemise/post.js";
-import { TagService } from "@blog/services/cemise/tag.js";
-import { serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -18,12 +15,7 @@ export default async function navRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const navs = await NavService.list();
-            const resp: NavsResponse = {};
-            navs.forEach((nav) => {
-                if (!(nav.id in resp)) resp[nav.id] = {};
-                resp[nav.id][nav.language] = nav;
-            })
-            response.send(resp);
+            response.send(navs);
         },
     });
 
@@ -54,14 +46,10 @@ export default async function navRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { navId } = request.params;
-            const navs = await NavService.get(navId);
+            const nav = await NavService.get(navId);
 
-            if (navs.length) {
-                const resp: NavResponse = {};
-                navs.forEach((nav) => {
-                    resp[nav.language] = nav;
-                })
-                response.send(resp);
+            if (nav) {
+                response.send(nav);
             } else {
                 response.status(404).send({ message: "nav_not_found" });
             }
@@ -81,10 +69,10 @@ export default async function navRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { navId } = request.params;
             const navData: CreateNavRequest = request.body;
-            console.log(navData)
             const nav = await NavService.update(navData, navId);
 
-            if (Object.keys(nav).length) {
+            //TODO error handling
+            if (nav) {
                 response.send(nav);
             } else {
                 response.status(404).send({ message: "nav_not_found" });

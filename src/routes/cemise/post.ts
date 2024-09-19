@@ -1,7 +1,5 @@
-import { Post, PostTag } from "@blog/database/schema.js";
-import { CreatePostRequest, ErrorResponse, PostBase, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
+import { CreatePostRequest, ErrorResponse, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import { PostService } from "@blog/services/cemise/post.js";
-import { serializePost, serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -20,7 +18,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const posts = await PostService.list();
-            response.send(serializePosts(posts));
+            response.send(posts);
         },
     });
 
@@ -36,7 +34,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const post: CreatePostRequest = request.body;
             const ns = await PostService.add(post, request.user);
-            response.status(201).send(serializePost(ns));
+            response.status(201).send(ns);
         },
     });
 
@@ -54,7 +52,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const posts = await PostService.get(postId);
 
             if (posts.length) {
-                response.send(serializePost(posts));
+                response.send(posts);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }
@@ -77,7 +75,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const post = await PostService.update(postData, postId);
 
             if (Object.keys(post).length) {
-                response.send(serializePost(post));
+                response.send(post);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }

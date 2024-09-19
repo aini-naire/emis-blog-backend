@@ -17,12 +17,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const tags = await TagService.list();
-            const resp: TagsResponse = {};
-            tags.forEach((tag) => {
-                if (!(tag.id in resp)) resp[tag.id] = {};
-                resp[tag.id][tag.language] = tag;
-            })
-            response.send(resp);
+            response.send(tags);
         },
     });
 
@@ -53,14 +48,10 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { tagId } = request.params;
-            const tags = await TagService.get(tagId);
+            const tag = await TagService.get(tagId);
 
-            if (tags.length) {
-                const resp: TagResponse = {};
-                tags.forEach((tag) => {
-                    resp[tag.language] = tag;
-                })
-                response.send(resp);
+            if (tag) {
+                response.send(tag);
             } else {
                 response.status(404).send({ message: "tag_not_found" });
             }
@@ -82,7 +73,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             const tagData: CreateTagRequest = request.body;
             const tag = await TagService.update(tagData, tagId);
 
-            if (Object.keys(tag).length) {
+            if (tag) {
                 response.send(tag);
             } else {
                 response.status(404).send({ message: "tag_not_found" });
@@ -102,13 +93,8 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { tagId } = request.params;
             const posts = await PostService.listByTag(tagId);
-            console.log(posts)
 
-            if (posts.length) {
-                response.send(serializePosts(posts.map((post) => post.post)));
-            } else {
-                response.send([]);
-            }
+            response.send(posts);
         },
     });
 }

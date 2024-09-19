@@ -6,7 +6,7 @@ import type { FastifyInstance } from "fastify";
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
-    server.get("/posts/:language", {
+    server.get("/posts/:language/:page", {
         schema: {
             tags: ["PUBLIC"],
             querystring: {
@@ -21,12 +21,9 @@ export default async function postRoutes(fastify: FastifyInstance) {
             }
         },
         handler: async (request, response) => {
-            const { language } = request.params;
-            const { page, results } = request.query;
-            console.log(BlogService.listPosts(language, page, results))
-            await Promise.all(BlogService.listPosts(language, page, results)).then(([posts, count]) => {
-                response.send(<PostListResponse>{ posts: posts, pages: Math.ceil(count[0].posts / (results ? results : 10) ), page: page ? page : 1 });
-            })
+            const { language, page } = request.params;
+            const [ posts, postCount ] = await BlogService.listPosts(language, page, 5)
+            response.send(<PostListResponse>{ posts: posts, pages: Math.ceil(postCount / 5 ), page: page ? page : 1 });
         },
     });
 
@@ -41,10 +38,10 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { postIdOrUrl } = request.params;
-            const posts = await BlogService.getPost(postIdOrUrl);
+            const post = await BlogService.getPost(postIdOrUrl);
 
-            if (posts.length) {
-                response.send(posts[0]);
+            if (post) {
+                response.send(post);
             } else {
                 response.status(404).send({ message: "post_not_found" });
             }

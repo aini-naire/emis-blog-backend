@@ -9,6 +9,6 @@ export const UserService = {
     },
 
     list: async function (): Promise<User[]> {
-        return database.query.users.findMany().execute();
+        return database.query.users.findMany();
     },
 }
