@@ -1,7 +1,6 @@
 import { User, users } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
 import { LoginRequest, PostBase, Tag, TagResponse } from "@blog/schemas/cemise.js";
-import * as bcrypt from "bcrypt";
 import { and, eq } from "drizzle-orm";
 
 export const AuthService = {
@@ -12,13 +11,13 @@ export const AuthService = {
             .where(eq(users.username, userCredentials.username))
             .then((user) => {
                 if (user.length) {
-                    if (bcrypt.compareSync(userCredentials.password, user[0].password)) {
+                    if (Bun.password.verifySync(userCredentials.password, user[0].password)) {
                         return user[0];
                     }
                 }
                 return null;
             }).catch((e) => {
-                const password = bcrypt.compareSync(userCredentials.password, "potato");
+                const password = Bun.password.verifySync(userCredentials.password, "potato");
                 return null;
             });
     },

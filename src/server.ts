@@ -1,6 +1,5 @@
 import { fastify, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import Env from "@fastify/env";
-import AutoLoad from "@fastify/autoload";
 import { join } from "desm";
 
 import { databasePlugin } from "@blog/plugins/database.js";
@@ -58,10 +57,13 @@ const main = async () => {
     }
 
     server.log.info("Registering routes");
-    await server.register(AutoLoad, {
-        dir: join(import.meta.url, "routes"),
-        dirNameRoutePrefix: true,
-    });
+    await server.register(import("@blog/routes/nav.js"), {});
+    await server.register(import("@blog/routes/posts.js"), {});
+    await server.register(import("@blog/routes/cemise/auth.js"), {prefix: "/cemise"});
+    await server.register(import("@blog/routes/cemise/nav.js"), {prefix: "/cemise"});
+    await server.register(import("@blog/routes/cemise/post.js"), {prefix: "/cemise"});
+    await server.register(import("@blog/routes/cemise/tag.js"), {prefix: "/cemise"});
+    await server.register(import("@blog/routes/cemise/user.js"), {prefix: "/cemise"});
 
 
     server.log.info("Listening on port " + server.config.PORT);
