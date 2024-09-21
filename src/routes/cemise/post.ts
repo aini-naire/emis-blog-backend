@@ -51,7 +51,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const { postId } = request.params;
             const posts = await PostService.get(postId);
 
-            if (posts.length) {
+            if (posts) {
                 response.send(posts);
             } else {
                 response.status(404).send({ message: "post_not_found" });
@@ -74,7 +74,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             const postData: CreatePostRequest = request.body;
             const post = await PostService.update(postData, postId);
 
-            if (Object.keys(post).length) {
+            if (post) {
                 response.send(post);
             } else {
                 response.status(404).send({ message: "post_not_found" });

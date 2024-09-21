@@ -93,7 +93,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { tagId } = request.params;
             const posts = await PostService.listByTag(tagId);
-
+            
             response.send(posts);
         },
     });

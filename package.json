@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "swc ./src -d dist",
-    "dev": "tsx watch ./src/server.ts",
+    "dev": "bun --watch ./src/server.ts",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate"
   },

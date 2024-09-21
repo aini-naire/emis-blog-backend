@@ -6,7 +6,7 @@ export default {
         let postResp: PostBase = post;
         postResp.tags = [];
         let tag: PostTag;
-        post.postTags.forEach((tag) => {
+        post.postTags?.forEach((tag) => {
             postResp.tags.push(tag.tag)
         });
         return postResp;

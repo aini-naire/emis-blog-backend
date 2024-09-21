@@ -40,7 +40,7 @@ export const PostService = {
             where: (postTag, { eq }) => eq(postTag.tagid, tagID),
             with: { post: { with: { author: true, postTags: { with: { tag: true } } } } }
         });
-        return PostSerializer.posts(posts);
+        return PostSerializer.posts(posts.map((post) => post.post));
     },
 
     get: async function (id: string): Promise<PostResponse|null> {
