@@ -51,7 +51,7 @@ export const NavService = {
             for (k in navData) {
                 let record: Partial<Nav> = navData[k]
                 record.language = EnumLanguage[k];
-                database.update(nav).set(record).where(and(eq(nav.id, id), eq(nav.language, record.language))).returning();
+                await database.update(nav).set(record).where(and(eq(nav.id, id), eq(nav.language, record.language))).returning();
             }
         }).then(() => true);
 

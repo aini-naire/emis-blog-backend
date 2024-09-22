@@ -17,13 +17,13 @@ export const PostService = {
                 record.id = uuid;
                 record.authorId = user.id;
                 record.language = EnumLanguage[k];
-                await database.insert(post).values(record).returning();
+                await tx.insert(post).values(record).returning();
             }
 
             postData.tags.map(async (tagID) => {
                 for (k in postData.content) {
                     let record: PostTag = { postid: uuid, tagid: tagID, language: k };
-                    await database.insert(postTags).values(record).returning();
+                    await tx.insert(postTags).values(record).returning();
                 }
             })
         }).then(() => true);
@@ -56,10 +56,10 @@ export const PostService = {
         const updateTx = await database.transaction(async (tx) => {
             let k: keyof CreatePostRequest['content'];
             for (k in postData.content) {
-                let record: Partial<Post> = postData.content[k]
-                console.log(record)
+                let record: Partial<Post> = postData.content[k];
+                record.language = EnumLanguage[k];
                 //TODO tags
-                await database.update(post).set(record).where(and(eq(post.id, id), eq(post.language, record.language))).returning();
+                let te = await tx.update(post).set(record).where(and(eq(post.id, id), eq(post.language, record.language))).returning();
             }
         }).then(() => true);
         return updateTx ? this.get(id) : null;

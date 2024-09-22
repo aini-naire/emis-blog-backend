@@ -22,7 +22,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { language, page } = request.params;
-            const [ posts, postCount ] = await BlogService.listPosts(language, page, 5)
+            const [ posts, postCount ] = await BlogService.listPosts(language, page, 5);
             response.send(<PostListResponse>{ posts: posts, pages: Math.ceil(postCount / 5 ), page: page ? page : 1 });
         },
     });
