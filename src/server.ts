@@ -60,6 +60,7 @@ const main = async () => {
     await server.register(import("@blog/routes/nav.js"), {});
     await server.register(import("@blog/routes/posts.js"), {});
     await server.register(import("@blog/routes/tag.js"), {});
+    await server.register(import("@blog/routes/seo.js"), {prefix: "/seo"});
     await server.register(import("@blog/routes/cemise/auth.js"), {prefix: "/cemise"});
     await server.register(import("@blog/routes/cemise/nav.js"), {prefix: "/cemise"});
     await server.register(import("@blog/routes/cemise/post.js"), {prefix: "/cemise"});
