@@ -45,13 +45,15 @@ export const Tag = Type.Object({
     id: Type.String({ type: 'uuid' }),
     title: Type.String(),
     language: Language,
-    tagline: Type.String()
+    tagline: Type.String(),
+    url: Type.String()
 })
 
 export type NewTag = Static<typeof NewTag>
 export const NewTag = Type.Object({
     title: Type.String(),
-    tagline: Type.String()
+    tagline: Type.String(),
+    url: Type.String()
 })
 
 export type CreateTagRequest = Static<typeof CreateTagRequest>

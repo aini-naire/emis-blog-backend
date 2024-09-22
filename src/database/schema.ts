@@ -51,6 +51,7 @@ export const tag = sqliteTable(
         language: text("language", { enum: ["EN", "PT"] }).notNull().$type<Language>(),
         title: text("title").notNull(),
         tagline: text("tagline").notNull(),
+        url: text("url").notNull().unique(),
     },
     (table) => {
         return {
