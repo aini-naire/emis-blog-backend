@@ -37,6 +37,7 @@ const main = async () => {
     await server.register(cors, {
         origin: [server.config.BLOG_URL, server.config.CEMISE_URL]
     })
+    console.log(server.config.BLOG_URL)
     server.register(databasePlugin);
     server.register(fastifyJwt, {
         secret: server.config.JWT_SECRET
