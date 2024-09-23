@@ -6,16 +6,15 @@ import type { FastifyInstance } from "fastify";
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
-    server.get("/post/:postIdOrUrl", {
+    server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
             response: {
-            },
-            security: [{ "CemiseAuth": [] }]
+            }
         },
         handler: async (request, response) => {
-            const { postIdOrUrl } = request.params;
-            const post = await BlogService.getPost(postIdOrUrl);
+            const { postURL } = request.params;
+            const post = await BlogService.getPost(postURL);
 
             if (post) {
                 response.type("text/html")
@@ -23,8 +22,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
   <html>
   <head>
     <meta charset="utf-8">
-    <meta name="description" content="`+post.tagline+`">
-    <title>emi's blog - `+post.title+`</title>
+    <meta name="description" content="`+ post.tagline + `">
+    <title>emi's blog - `+ post.title + `</title>
   </head>
 </html>`);
             } else {

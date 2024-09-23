@@ -33,10 +33,10 @@ const main = async () => {
     });
 
     server.log.info("Setting up plugins");
-    await server.register(cors, {
-        origin: "*"
-    })
     await server.register(Env, { schema: ConfigSchema, dotenv: true });
+    await server.register(cors, {
+        origin: [server.config.BLOG_URL, server.config.CEMISE_URL]
+    });
     server.register(databasePlugin);
     server.register(fastifyJwt, {
         secret: server.config.JWT_SECRET
@@ -50,7 +50,7 @@ const main = async () => {
         } else {
             return response.code(401).send({ message: 'auth_required' })
         }
-    })
+    });
 
     if (server.config.NODE_ENV !== "production") {
         server.register(swagger);

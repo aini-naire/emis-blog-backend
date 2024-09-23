@@ -2,8 +2,9 @@
 ### TODO
 #### Functionality:
  - [ ] handle existing post tags removal/add
+ - [ ] nav/tag/post deletion
  - [ ] rpi optimization
  - [x] improve services return consistency
  - [ ] deploytool logging
- - [ ] error handling
- - [ ] cors and cache control
+ - [ ] proper error handling
+ - [x] cors and cache control

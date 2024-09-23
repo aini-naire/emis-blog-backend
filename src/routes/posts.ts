@@ -1,4 +1,5 @@
 import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
+import { EnumLanguage } from "@blog/schemas/cemise.js";
 import BlogService from "@blog/services/blog.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
@@ -9,11 +10,16 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.get("/posts/:language/:page", {
         schema: {
             tags: ["PUBLIC"],
-            querystring: {
+            params: {
                 type: 'object',
                 properties: {
-                    page: { type: 'integer' },
-                    results: { type: 'integer' }
+                    language: {
+                        type: "string",
+                        enum: Object.values(EnumLanguage)
+                    },
+                    page: {
+                        type: "number"
+                    }
                 }
             },
             response: {
@@ -27,7 +33,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
     });
 
-    server.get("/post/:postIdOrUrl", {
+    server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
             response: {
@@ -37,8 +43,8 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { postIdOrUrl } = request.params;
-            const post = await BlogService.getPost(postIdOrUrl);
+            const { postURL } = request.params;
+            const post = await BlogService.getPost(postURL);
 
             if (post) {
                 response.send(post);
