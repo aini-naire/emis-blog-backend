@@ -9,13 +9,6 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.get("/tag/:tagURL/:page", {
         schema: {
             tags: ["PUBLIC"],
-            querystring: {
-                type: 'object',
-                properties: {
-                    page: { type: 'integer' },
-                    results: { type: 'integer' }
-                }
-            },
             response: {
                 200: PostListResponse,
             }
