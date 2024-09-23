@@ -34,7 +34,7 @@ export default {
     listPostsByTag: async function (tagURL: string, page: number = 1, results: number = 10) {
         const selectedTag = await this.getTag(tagURL);
         if (!selectedTag) return null;
-        
+
         const postsQuery = await database.select({
             id: post.id,
             language: post.language,
@@ -47,7 +47,7 @@ export default {
             .from(postTags)
             .innerJoin(post, eq(postTags.postid, post.id))
             .innerJoin(users, eq(post.authorId, users.id))
-            .where(and(eq(postTags.tagid, selectedTag.id), eq(postTags.language, selectedTag.language), eq(post.hidden, 0), eq(post.page, 0), eq(post.private, 0)))
+            .where(and(eq(postTags.tagid, selectedTag.id), eq(postTags.language, selectedTag.language), eq(post.hidden, false), eq(post.page, false), eq(post.private, false)))
             .offset((page - 1) * results)
             .limit(results)
             .orderBy(desc(post.created));
@@ -55,8 +55,8 @@ export default {
         const countQuery = database.select({ posts: count() })
             .from(postTags)
             .innerJoin(post, eq(postTags.postid, post.id))
-            .where(and(eq(postTags.tagid, selectedTag.id), eq(postTags.language, selectedTag.language), eq(post.hidden, 0), eq(post.page, 0), eq(post.private, 0)));
-        
+            .where(and(eq(postTags.tagid, selectedTag.id), eq(postTags.language, selectedTag.language), eq(post.hidden, false), eq(post.page, false), eq(post.private, false)));
+
         const [posts, postCount] = await Promise.all([postsQuery, countQuery]);
         return [posts, postCount[0].posts];
     },
