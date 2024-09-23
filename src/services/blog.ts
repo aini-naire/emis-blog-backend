@@ -1,8 +1,8 @@
 import { nav, post, Post, postTags, tag, users } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
-import { PostBase } from "@blog/schemas/blog.js";
+import { LanguageLink, PostBase, TagLink } from "@blog/schemas/blog.js";
 import { Language, Tag } from "@blog/schemas/cemise.js";
-import { and, asc, count, desc, eq } from "drizzle-orm";
+import { aliasedTable, and, asc, count, desc, eq, not } from "drizzle-orm";
 
 export default {
     listTags: async function (): Promise<Tag[]> {
@@ -16,26 +16,53 @@ export default {
     },
 
     listPosts: async function (language: Language, page: number = 1, results: number = 10) {
-        const postsQuery = database.query.post.findMany({
-            columns: {
-                content: false
-            },
-            offset: (page - 1) * results,
-            limit: results,
-            orderBy: desc(post.created),
-            where: (post, { eq, and }) => and(eq(post.hidden, false), eq(post.page, false), eq(post.language, language)),
-            with: { author: true }
-        });
+        const postsQuery = database.select({
+            id: post.id,
+            language: post.language,
+            created: post.created,
+            url: post.url,
+            title: post.title,
+            tagline: post.tagline,
+            showAuthor: post.showAuthor,
+            author: { fullName: users.fullName }
+        })
+            .from(post)
+            .fullJoin(users, eq(post.authorId, users.id))
+            .where(and(eq(post.language, language), eq(post.hidden, false), eq(post.page, false), eq(post.private, false)))
+            .offset((page - 1) * results)
+            .limit(results)
+            .orderBy(desc(post.created)).as("post");
+
+        const tagsQuery = database.select()
+            .from(postTags)
+            .rightJoin(postsQuery, and(eq(postTags.postid, postsQuery.id), eq(postTags.language, language)))
+            .leftJoin(tag, and(eq(postTags.tagid, tag.id), eq(tag.language, language)));
+
         const countQuery = database.select({ posts: count() }).from(post).where(and(eq(post.hidden, false), eq(post.page, false), eq(post.language, language)));
-        const [posts, postCount] = await Promise.all([postsQuery, countQuery])
-        return [posts, postCount[0].posts];
+        const [posts, postCount] = await Promise.all([tagsQuery, countQuery]);
+
+        let result = posts.reduce((arr, row) => {
+            const post = row.post;
+            const tag = row.tags;
+
+            if (!arr[post.id]) {
+                arr[post.id] = { ...post, tags: [] }
+            }
+
+            if (tag) {
+                arr[post.id].tags.push(tag)
+            }
+
+            return arr;
+        }, []);
+        return [Object.values(result).sort((a, b) => new Date(b.created) - new Date(a.created)), postCount[0].posts];
     },
 
     listPostsByTag: async function (tagURL: string, page: number = 1, results: number = 10) {
         const selectedTag = await this.getTag(tagURL);
         if (!selectedTag) return null;
 
-        const postsQuery = await database.select({
+        const postsQuery = database.select({
             id: post.id,
             language: post.language,
             created: post.created,
@@ -66,14 +93,27 @@ export default {
         return navs;
     },
 
-    getPost: async function (id: string): Promise<PostBase | null> {
-        const post = await database.query.post.findMany({
-            where: (post, { or, eq }) => (or(eq(post.id, id), eq(post.url, id))),
+    getPost: async function (url: string): Promise<PostBase | null> {
+        
+        const postQuery = await database.query.post.findMany({
+            where: (post, { eq, and }) => (and(eq(post.url, url), eq(post.private, false))),
             with: { author: true }
         });
 
-        if (post.length) {
-            if (!post[0].private) return post[0]
+
+        if (postQuery.length) {
+            const postObj = <PostBase>postQuery[0];
+            const postID = postQuery[0].id;
+            
+            const langQuery = database.select({language: post.language, url: post.url}).from(post).where(and(eq(post.id, postID), eq(post.private, false), eq(post.hidden, false), not(eq(post.language, postObj.language))))
+            const tagsQuery = database.select({title: tag.title, url: tag.url}).from(postTags)
+            .where(and(eq(postTags.postid, postID), eq(postTags.language, postObj.language)))
+            .fullJoin(tag, and(eq(postTags.tagid, tag.id), eq(postTags.language, tag.language)));
+            const [lang, tags]:[LanguageLink[], TagLink[]] = await Promise.all([langQuery, tagsQuery]);
+            console.log(lang,tags)
+            postObj.languages = lang;
+            postObj.tags = tags;
+            return postObj;
         }
         return null;
     },
