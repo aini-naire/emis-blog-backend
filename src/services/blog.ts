@@ -71,6 +71,10 @@ export default {
             where: (post, { or, eq }) => (or(eq(post.id, id), eq(post.url, id))),
             with: { author: true }
         });
-        return post.length ? post[0] : null;
+
+        if (post.length) {
+            if (!post[0].private) return post[0]
+        }
+        return null;
     },
 };
