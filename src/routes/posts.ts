@@ -28,19 +28,26 @@ export default async function postRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const { language, page } = request.params;
-            const [ posts, postCount ] = await BlogService.listPosts(language, page, 5);
-            response.send(<PostListResponse>{ posts: posts, pages: Math.max(1, (Math.ceil(postCount / 5 ))), page: page ? page : 1 });
+            const [posts, postCount] = await BlogService.listPosts(language, page, 5);
+            response.send(<PostListResponse>{ posts: posts, pages: Math.max(1, (Math.ceil(postCount / 5))), page: page ? page : 1 });
         },
     });
 
     server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    postURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
                 200: PostBase,
                 404: ErrorResponse,
-            },
-            security: [{ "CemiseAuth": [] }]
+            }
         },
         handler: async (request, response) => {
             const { postURL } = request.params;

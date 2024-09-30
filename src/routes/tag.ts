@@ -1,14 +1,27 @@
 import { ErrorResponse, PostBase, PostListResponse, Tag } from "@blog/schemas/blog.js";
+import { EnumLanguage } from "@blog/schemas/cemise.js";
 import BlogService from "@blog/services/blog.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
-export default async function postRoutes(fastify: FastifyInstance) {
+export default async function tagRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
     server.get("/tag/:tagURL/:page", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    language: {
+                        type: "string",
+                        enum: Object.values(EnumLanguage)
+                    },
+                    page: {
+                        type: "number"
+                    }
+                }
+            },
             response: {
                 200: PostListResponse,
                 404: ErrorResponse,
@@ -30,6 +43,14 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.get("/tag/:tagURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    tagURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
                 200: Tag,
                 404: ErrorResponse,

@@ -14,12 +14,20 @@ function renderHTML(title: string, desc: string) {
 </html>`
 }
 
-export default async function postRoutes(fastify: FastifyInstance) {
+export default async function seoRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
     server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    postURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
             }
         },
@@ -39,6 +47,14 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.get("/tag/:tagURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    tagURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
             }
         },

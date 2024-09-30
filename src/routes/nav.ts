@@ -4,7 +4,7 @@ import BlogService from "@blog/services/blog.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
-export default async function postRoutes(fastify: FastifyInstance) {
+export default async function navRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
     server.get("/nav/:language", {
