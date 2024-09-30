@@ -72,7 +72,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
         handler: async (request, response) => {
             const { postId } = request.params;
             const postData: CreatePostRequest = request.body;
-            const post = await PostService.update(postData, postId);
+            const post = await PostService.update(postData, postId, request.user);
 
             if (post) {
                 response.send(post);
