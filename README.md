@@ -2,7 +2,7 @@
 Simple personal Blog built from scratch
 ### TODO
 #### Functionality:
- - [ ] handle existing post tags removal/add
+ - [x] handle existing post tags removal/add
  - [ ] nav/tag/post deletion
  - [ ] rss
  - [ ] rpi optimization
