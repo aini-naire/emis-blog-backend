@@ -65,6 +65,16 @@ export const PostService = {
                     record.authorId = user.id;
                     await tx.insert(post).values(record).returning();
                 }
+
+                const currentTags = await tx.select().from(postTags).where(and(eq(postTags.postid, id), eq(postTags.language, EnumLanguage[k])));
+                if (currentTags.length != postData.tags.length) {
+                    await tx.delete(postTags).where(and(eq(postTags.postid, id), eq(postTags.language, EnumLanguage[k])));
+                    
+                    postData.tags.map(async (tagID) => {
+                            let record: PostTag = { postid: id, tagid: tagID, language: k };
+                            await tx.insert(postTags).values(record).returning();
+                    });
+                }
             }
         }).then(() => true);
         return updateTx ? this.get(id) : null;
