@@ -28,9 +28,8 @@ declare module "fastify" {
 }
 
 const main = async () => {
-    const server = fastify({
-        logger: true
-    });
+       
+    const server = fastify({logger:true});
 
     server.log.info("Setting up plugins");
     await server.register(Env, { schema: ConfigSchema, dotenv: true });
@@ -57,10 +56,11 @@ const main = async () => {
     }
 
     server.log.info("Registering routes");
-    await server.register(import("@blog/routes/nav.js"), {});
-    await server.register(import("@blog/routes/posts.js"), {});
-    await server.register(import("@blog/routes/tag.js"), {});
-    await server.register(import("@blog/routes/seo.js"), {prefix: "/seo"});
+    await server.register(import("@blog/routes/blog/nav.js"), {});
+    await server.register(import("@blog/routes/blog/posts.js"), {});
+    await server.register(import("@blog/routes/blog/tag.js"), {});
+    await server.register(import("@blog/routes/blog/rss.js"), {});
+    await server.register(import("@blog/routes/blog/seo.js"), {prefix: "/seo"});
     await server.register(import("@blog/routes/cemise/auth.js"), {prefix: "/cemise"});
     await server.register(import("@blog/routes/cemise/nav.js"), {prefix: "/cemise"});
     await server.register(import("@blog/routes/cemise/post.js"), {prefix: "/cemise"});

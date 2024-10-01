@@ -46,7 +46,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const userData: NewUser = request.body;
+            const userData: CreateUserRequest = request.body;
             const ns = await UserService.add(userData);
             return ns[0];
         },

@@ -8,11 +8,11 @@ import {
     primaryKey,
 } from "drizzle-orm/sqlite-core";
 
-export const post = sqliteTable("posts",
+const postsTable = sqliteTable("posts",
     {
-        id: text("id").$defaultFn(() => randomUUID()),
-        hidden: integer("hidden", { mode: "boolean" }),
-        authorId: text("author_Id").references(() => users.id),
+        id: text("id").notNull().$defaultFn(() => randomUUID()),
+        hidden: integer("hidden", { mode: "boolean" }).notNull(),
+        authorId: text("author_Id").notNull().references(() => usersTable.id),
         created: text("created").default(sql`(CURRENT_TIMESTAMP)`),
         modified: text("modified")
             .default(sql`(CURRENT_TIMESTAMP)`)
@@ -33,18 +33,18 @@ export const post = sqliteTable("posts",
     }
 );
 
-export const postRelations = relations(post, ({ many, one }) => ({
-    postTags: many(postTags),
-    author: one(users, { fields: [post.authorId], references: [users.id] }),
+const postRelations = relations(postsTable, ({ many, one }) => ({
+    postTags: many(postTagsTable),
+    author: one(usersTable, { fields: [postsTable.authorId], references: [usersTable.id] }),
 }));
 
-export const postTags = sqliteTable("post_tags", {
-    postid: text("post_id").references(() => post.id),
-    tagid: text("tag_id").references(() => tag.id),
+const postTagsTable = sqliteTable("post_tags", {
+    postid: text("post_id").references(() => postsTable.id),
+    tagid: text("tag_id").references(() => tagsTable.id),
     language: text("language", { enum: ["EN", "PT"] }),
 });
 
-export const tag = sqliteTable(
+const tagsTable = sqliteTable(
     "tags",
     {
         id: text("id").$defaultFn(() => randomUUID()),
@@ -60,22 +60,22 @@ export const tag = sqliteTable(
     }
 );
 
-export const tagRelations = relations(tag, ({ many }) => ({
-    postTags: many(postTags),
+const tagRelations = relations(tagsTable, ({ many }) => ({
+    postTags: many(postTagsTable),
 }));
 
-export const postTagsRelations = relations(postTags, ({ one }) => ({
-    tag: one(tag, {
-        fields: [postTags.tagid, postTags.language],
-        references: [tag.id, tag.language],
+const postTagsRelations = relations(postTagsTable, ({ one }) => ({
+    tag: one(tagsTable, {
+        fields: [postTagsTable.tagid, postTagsTable.language],
+        references: [tagsTable.id, tagsTable.language],
     }),
-    post: one(post, {
-        fields: [postTags.postid, postTags.language],
-        references: [post.id, post.language],
+    post: one(postsTable, {
+        fields: [postTagsTable.postid, postTagsTable.language],
+        references: [postsTable.id, postsTable.language],
     }),
 }));
 
-export const users = sqliteTable("users", {
+const usersTable = sqliteTable("users", {
     id: text("id")
         .primaryKey()
         .$defaultFn(() => randomUUID()),
@@ -85,7 +85,7 @@ export const users = sqliteTable("users", {
     fullName: text("full_name"),
 });
 
-export const nav = sqliteTable("nav", {
+const navTable = sqliteTable("nav", {
     id: text("id")
         .$defaultFn(() => randomUUID()),
     language: text("language", { enum: ["EN", "PT"] }).notNull().$type<Language>(),
@@ -100,8 +100,10 @@ export const nav = sqliteTable("nav", {
         };
     });
 
-export type Post = typeof post.$inferSelect;
-export type User = typeof users.$inferSelect;
-export type Tag = typeof tag.$inferSelect;
-export type PostTag = typeof postTags.$inferSelect;
-export type Nav = typeof nav.$inferSelect;
+type User = typeof usersTable.$inferSelect;
+type Post = typeof postsTable.$inferSelect;
+type PostTag = typeof postTagsTable.$inferSelect;
+type Nav = typeof navTable.$inferSelect;
+type Tag = typeof tagsTable.$inferSelect;
+
+export { postsTable, postTagsTable, tagsTable, navTable, usersTable, User, Post, PostTag, Nav, Tag }

@@ -1,6 +1,6 @@
 import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
-import { EnumLanguage } from "@blog/schemas/cemise.js";
-import BlogService from "@blog/services/blog.js";
+import { EnumLanguage, Language } from "@blog/schemas/cemise.js";
+import { PostListService } from "@blog/services/blog/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 import RSS from "rss";
@@ -30,8 +30,8 @@ export default async function RSSRoute(fastify: FastifyInstance) {
             }
         },
         handler: async (request, response) => {
-            const { language } = request.params;
-            const [posts, postCount]: [PostBase[], number] = await BlogService.listPosts(language, 1, 20);
+            const { language } = request.params as {language: Language};
+            const [posts, postCount] = await PostListService.listPosts(language, 1, 20);
             const feed = new RSS(options);
             posts.forEach((post) => {
                 feed.item({

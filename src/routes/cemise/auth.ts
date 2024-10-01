@@ -1,3 +1,4 @@
+import { User } from "@blog/database/schema.js";
 import { ErrorResponse, LoginRequest, LoginResponse } from "@blog/schemas/cemise.js";
 import { AuthService } from "@blog/services/cemise/auth.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";

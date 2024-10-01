@@ -1,7 +1,6 @@
 import { CreateTagRequest, ErrorResponse, PostsResponse, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
 import { PostService } from "@blog/services/cemise/post.js";
 import { TagService } from "@blog/services/cemise/tag.js";
-import { serializePosts } from "@blog/util/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -32,7 +31,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const tag: CreateTagRequest = request.body;
-            const addedTag = await TagService.add(tag, request.user);
+            const addedTag = await TagService.add(tag);
             response.status(201).send(addedTag);
         },
     });
@@ -47,7 +46,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { tagId } = request.params;
+            const { tagId } = request.params as {tagId : string};
             const tag = await TagService.get(tagId);
 
             if (tag) {
@@ -69,7 +68,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { tagId } = request.params;
+            const { tagId } = request.params as {tagId : string};
             const tagData: CreateTagRequest = request.body;
             const tag = await TagService.update(tagData, tagId);
 
@@ -91,7 +90,7 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { tagId } = request.params;
+            const { tagId } = request.params as {tagId : string};
             const posts = await PostService.listByTag(tagId);
             
             response.send(posts);

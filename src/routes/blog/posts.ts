@@ -1,13 +1,18 @@
-import { ErrorResponse, PostBase, PostListResponse, Tag } from "@blog/schemas/blog.js";
-import { EnumLanguage } from "@blog/schemas/cemise.js";
-import BlogService from "@blog/services/blog.js";
+import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
+import { EnumLanguage, Language } from "@blog/schemas/cemise.js";
+import { PostListService } from "@blog/services/blog/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
-export default async function tagRoutes(fastify: FastifyInstance) {
+interface LanguagePaginator {
+    language: Language;
+    page: number;
+}
+
+export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
-    server.get("/tag/:tagURL/:page", {
+    server.get("/posts/:language/:page", {
         schema: {
             tags: ["PUBLIC"],
             params: {
@@ -24,46 +29,39 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             },
             response: {
                 200: PostListResponse,
-                404: ErrorResponse,
             }
         },
         handler: async (request, response) => {
-            const { tagURL, page } = request.params;
-            let posts = await BlogService.listPostsByTag(tagURL, page, 5);
-
-            if (posts) {
-                const [postList, postCount] = posts;
-                response.send(<PostListResponse>{ posts: postList, pages: Math.ceil(postCount / 5), page: page ? page : 1 });
-            } else {
-                response.status(404).send({ message: "tag_not_found" });
-            }
+            const { language, page } = request.params as LanguagePaginator;
+            const [posts, postCount] = await PostListService.listPosts(language, page, 5);
+            response.send({ posts: posts, pages: Math.max(1, (Math.ceil(postCount / 5))), page: page ? page : 1 } as PostListResponse);
         },
     });
 
-    server.get("/tag/:tagURL", {
+    server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
             params: {
                 type: 'object',
                 properties: {
-                    tagURL: {
+                    postURL: {
                         type: "string"
                     },
                 }
             },
             response: {
-                200: Tag,
+                200: PostBase,
                 404: ErrorResponse,
             }
         },
         handler: async (request, response) => {
-            const { tagURL } = request.params;
-            const tag = await BlogService.getTag(tagURL);
+            const { postURL } = request.params as {postURL: string};
+            const post = await PostListService.getPost(postURL);
 
-            if (tag) {
-                response.send(tag);
+            if (post) {
+                response.send(post);
             } else {
-                response.status(404).send({ message: "tag_not_found" });
+                response.status(404).send({ message: "post_not_found" });
             }
         },
     });
