@@ -106,4 +106,4 @@ type PostTag = typeof postTagsTable.$inferSelect;
 type Nav = typeof navTable.$inferSelect;
 type Tag = typeof tagsTable.$inferSelect;
 
-export { postsTable, postTagsTable, tagsTable, navTable, usersTable, User, Post, PostTag, Nav, Tag }
+export { postsTable, postTagsTable, tagsTable, navTable, usersTable, tagRelations, postRelations, postTagsRelations, User, Post, PostTag, Nav, Tag }
