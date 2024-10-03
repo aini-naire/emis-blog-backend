@@ -3,6 +3,7 @@ import { database } from "@blog/plugins/database.js";
 import { LanguageLink, TagLink, PostBase } from "@blog/schemas/blog.js";
 import { Language } from "@blog/schemas/cemise.js";
 import { and, count, desc, eq, not } from "drizzle-orm";
+import { TagService } from "./tag.js";
 
 
 const postSelect = {
@@ -54,7 +55,7 @@ const PostListService = {
     },
 
     listPostsByTag: async function (tagURL: string, page: number = 1, results: number = 10): Promise<[PostBase[], number]>  {
-        const selectedTag = await this.getTag(tagURL);
+        const selectedTag = await TagService.getTag(tagURL);
         if (!selectedTag) return null;
 
         const postsQuery = database.select(postSelect)
