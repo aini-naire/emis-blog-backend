@@ -10,7 +10,7 @@ import { User } from "./database/schema.js";
 
 type ConfigSchema = Static<typeof ConfigSchema>
 const ConfigSchema = Type.Object({
-    NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production')]),
+    NODE_ENV: Type.Union([Type.Literal('dev'), Type.Literal('production'), Type.Literal('test')]),
     PORT: Type.Number(),
     JWT_SECRET: Type.String(),
     CEMISE_URL: Type.String(),
