@@ -27,6 +27,14 @@ declare module "fastify" {
 }
 
 const buildServer = async () => {
+    const logger = {
+        transport: {
+            pipeline: [{
+                target: '@blog/plugins/logger.ts',
+                options: { destination: 1 }
+            }]
+        },
+    }
 
     const server = fastify({ logger: true });
 

@@ -133,3 +133,4 @@ dist
 
 devdist
 sqlite.db
+package-lock.json
