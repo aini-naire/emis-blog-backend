@@ -74,7 +74,7 @@ const PostListService = {
 
         const countQuery = database.select({ posts: count() })
             .from(postTagsTable)
-            .innerJoin(postsTable, and(eq(postTagsTable.postid, postsTable.id), eq(postTagsTable.language, selectedTag.language)))
+            .innerJoin(postsTable, and(eq(postTagsTable.postid, postsTable.id), eq(postTagsTable.language, postsTable.language)))
             .where(and(eq(postTagsTable.tagid, selectedTag.id), eq(postTagsTable.language, selectedTag.language), eq(postsTable.hidden, false), eq(postsTable.page, false), eq(postsTable.private, false)));
 
         const [posts, postCount] = await Promise.all([tagsQuery, countQuery]);
