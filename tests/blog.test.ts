@@ -133,3 +133,14 @@ test('test tag post listing pagination', async () => {
     expect(resp.body.posts.length).toBe(3);
     expect(resp.body.posts[0].title).toBe("test10");
 });
+
+test('test tag post listing pagination', async () => {
+    let resp: Response;
+    const tag = await TagService.add(tagSeed);
+
+    
+    resp = await supertest(server.server)
+    .get("/tag/test")
+    .expect(200);
+    expect(resp.body.tagline).toBe("test tagline")
+});

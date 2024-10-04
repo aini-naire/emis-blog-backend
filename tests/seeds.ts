@@ -39,14 +39,14 @@ export const userSeed: Partial<User> = {
 
 export const tagSeed: CreateTagRequest = {
     EN: {
-        title: "test",
+        title: "test title",
         url: "test",
-        tagline: "test",
+        tagline: "test tagline",
     },
     PT: {
-        title: "teste",
+        title: "teste title",
         url: "teste",
-        tagline: "test",
+        tagline: "test tagline",
     },
 }
 
