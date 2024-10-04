@@ -19,9 +19,8 @@ export default async function tagRoutes(fastify: FastifyInstance) {
             params: {
                 type: 'object',
                 properties: {
-                    language: {
-                        type: "string",
-                        enum: Object.values(EnumLanguage)
+                    tagURL: {
+                        type: "string"
                     },
                     page: {
                         type: "number"
