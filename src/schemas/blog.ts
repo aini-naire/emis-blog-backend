@@ -11,7 +11,8 @@ export const Language = Type.Enum(EnumLanguage)
 export type Nav = Static<typeof Nav>
 export const Nav = Type.Object({
     text: Type.String(),
-    url: Type.String()
+    url: Type.String(),
+    external: Type.Boolean()
 })
 
 export type NavResponse = Static<typeof NavResponse>
