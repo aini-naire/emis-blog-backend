@@ -20,6 +20,7 @@ export const Nav = Type.Object({
     language: Language,
     url: Type.String(),
     enabled: Type.Boolean(),
+    external: Type.Boolean(),
     order: Type.Number()
 })
 
@@ -28,6 +29,7 @@ export const NewNav = Type.Object({
     text: Type.String(),
     url: Type.String(),
     enabled: Type.Boolean(),
+    external: Type.Boolean(),
     order: Type.Number()
 })
 

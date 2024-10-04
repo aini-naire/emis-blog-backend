@@ -17,6 +17,7 @@ export type Nav = {
     language: Language;
     url: string;
     enabled: boolean;
+    external: boolean;
     order: number;
 }
 
@@ -24,6 +25,7 @@ export type NewNav = {
     text: string;
     url: string;
     enabled: boolean;
+    external: boolean;
     order: number;
 }
 

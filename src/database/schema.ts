@@ -92,6 +92,7 @@ const navTable = sqliteTable("nav", {
     url: text("url"),
     text: text("text"),
     enabled: integer("enabled", { mode: "boolean" }),
+    external: integer("external", { mode: "boolean" }),
     order: integer("order"),
 },
     (table) => {
