@@ -30,7 +30,7 @@ export default async function navRoutes(fastify: FastifyInstance) {
         },
         handler: async (request, response) => {
             const nav: CreateNavRequest = request.body;
-            const addedNav = await NavService.add(nav, request.user);
+            const addedNav = await NavService.add(nav);
             response.status(201).send(addedNav);
         },
     });
@@ -45,7 +45,7 @@ export default async function navRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { navId } = request.params;
+            const { navId } = request.params as {navId : string};
             const nav = await NavService.get(navId);
 
             if (nav) {
@@ -67,7 +67,7 @@ export default async function navRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { navId } = request.params;
+            const { navId } = request.params as {navId : string};
             const navData: CreateNavRequest = request.body;
             const nav = await NavService.update(navData, navId);
 

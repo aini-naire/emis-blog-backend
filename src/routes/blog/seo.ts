@@ -1,5 +1,6 @@
 import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
-import BlogService from "@blog/services/blog.js";
+import { PostListService } from "@blog/services/blog/post.js";
+import { TagService } from "@blog/services/blog/tag.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
 
@@ -14,18 +15,26 @@ function renderHTML(title: string, desc: string) {
 </html>`
 }
 
-export default async function postRoutes(fastify: FastifyInstance) {
+export default async function seoRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
 
     server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    postURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
             }
         },
         handler: async (request, response) => {
-            const { postURL } = request.params;
-            const post = await BlogService.getPost(postURL);
+            const { postURL } = request.params as { postURL: string };
+            const post = await PostListService.getPost(postURL);
 
             if (post) {
                 response.type("text/html")
@@ -39,12 +48,20 @@ export default async function postRoutes(fastify: FastifyInstance) {
     server.get("/tag/:tagURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    tagURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
             }
         },
         handler: async (request, response) => {
-            const { tagURL } = request.params;
-            const tag = await BlogService.getTag(tagURL);
+            const { tagURL } = request.params as { tagURL: string };
+            const tag = await TagService.getTag(tagURL);
 
             if (tag) {
                 response.type("text/html")

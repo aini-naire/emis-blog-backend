@@ -32,9 +32,9 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const post: CreatePostRequest = request.body;
-            const ns = await PostService.add(post, request.user);
-            response.status(201).send(ns);
+            const postData: CreatePostRequest = request.body;
+            const post = await PostService.add(postData, request.user);
+            response.status(201).send(post);
         },
     });
 
@@ -48,7 +48,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { postId } = request.params;
+            const { postId } = request.params as {postId: string};
             const posts = await PostService.get(postId);
 
             if (posts) {
@@ -70,7 +70,7 @@ export default async function postRoutes(fastify: FastifyInstance) {
             security: [{ "CemiseAuth": [] }]
         },
         handler: async (request, response) => {
-            const { postId } = request.params;
+            const { postId } = request.params as {postId: string};
             const postData: CreatePostRequest = request.body;
             const post = await PostService.update(postData, postId, request.user);
 

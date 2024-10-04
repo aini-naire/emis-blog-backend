@@ -1,8 +1,13 @@
 import { ErrorResponse, PostBase, PostListResponse } from "@blog/schemas/blog.js";
-import { EnumLanguage } from "@blog/schemas/cemise.js";
-import BlogService from "@blog/services/blog.js";
+import { EnumLanguage, Language } from "@blog/schemas/cemise.js";
+import { PostListService } from "@blog/services/blog/post.js";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import type { FastifyInstance } from "fastify";
+
+interface LanguagePaginator {
+    language: Language;
+    page: number;
+}
 
 export default async function postRoutes(fastify: FastifyInstance) {
     const server = fastify.withTypeProvider<TypeBoxTypeProvider>();
@@ -27,24 +32,31 @@ export default async function postRoutes(fastify: FastifyInstance) {
             }
         },
         handler: async (request, response) => {
-            const { language, page } = request.params;
-            const [ posts, postCount ] = await BlogService.listPosts(language, page, 5);
-            response.send(<PostListResponse>{ posts: posts, pages: Math.max(1, (Math.ceil(postCount / 5 ))), page: page ? page : 1 });
+            const { language, page } = request.params as LanguagePaginator;
+            const [posts, postCount] = await PostListService.listPosts(language, page, 5);
+            response.send({ posts: posts, pages: Math.max(1, (Math.ceil(postCount / 5))), page: page ? page : 1 } as PostListResponse);
         },
     });
 
     server.get("/post/:postURL", {
         schema: {
             tags: ["PUBLIC"],
+            params: {
+                type: 'object',
+                properties: {
+                    postURL: {
+                        type: "string"
+                    },
+                }
+            },
             response: {
                 200: PostBase,
                 404: ErrorResponse,
-            },
-            security: [{ "CemiseAuth": [] }]
+            }
         },
         handler: async (request, response) => {
-            const { postURL } = request.params;
-            const post = await BlogService.getPost(postURL);
+            const { postURL } = request.params as {postURL: string};
+            const post = await PostListService.getPost(postURL);
 
             if (post) {
                 response.send(post);

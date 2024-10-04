@@ -1,20 +1,21 @@
-import { tag, User } from "@blog/database/schema.js";
+import { Tag, tagsTable, usersTable } from "@blog/database/schema.js";
 import { database } from "@blog/plugins/database.js";
-import { CreateTagRequest, EnumLanguage, Language, Tag, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
+import { CreateTagRequest, EnumLanguage, Language, TagResponse, TagsResponse } from "@blog/schemas/cemise.js";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 
+
 export const TagService = {
-    add: async function (tagData: CreateTagRequest, user: User): Promise<Record<string, Tag>> {
+    add: async function (tagData: CreateTagRequest): Promise<Record<Language, Tag>> {
         const uuid = randomUUID();
 
         const insertTx = await database.transaction(async (tx) => {
             let k: keyof CreateTagRequest;
             for (k in tagData) {
-                let record: Tag = tagData[k]
+                let record: Partial<Tag> = tagData[k];
                 record.id = uuid;
                 record.language = EnumLanguage[k];
-                await database.insert(tag).values(record).returning()
+                await tx.insert(tagsTable).values(record as Tag).returning()
             }
         }).then(() => true);
 
@@ -22,20 +23,20 @@ export const TagService = {
     },
 
     list: async function (): Promise<TagsResponse> {
-        const tags: Tag[] = await database.query.tag.findMany();
+        const tags = await database.select().from(tagsTable);
 
         const tagsObj: TagsResponse = {};
         tags.forEach((tag) => {
-            if (!(tag.id in tagsObj)) tagsObj[tag.id] = <TagResponse>{};
+            if (!(tag.id in tagsObj)) tagsObj[tag.id] = {} as TagResponse;
             tagsObj[tag.id][tag.language] = tag;
         });
         return tagsObj;
     },
 
     get: async function (id: string): Promise<TagResponse | null> {
-        const tag = await database.query.tag.findMany({ where: (tag, { eq }) => (eq(tag.id, id)) });
+        const tag = await database.query.tagsTable.findMany({ where: (tag, { eq }) => (eq(tag.id, id)) });
         if (tag.length) {
-            const tagObj = <TagResponse>{};
+            const tagObj = {} as TagResponse;
             tag.forEach((tagItem) => {
                 tagObj[tagItem.language] = tagItem;
             });
@@ -47,11 +48,10 @@ export const TagService = {
     update: async function (tagData: CreateTagRequest, id: string): Promise<Record<Language, Tag> | null> {
         const updateTx = await database.transaction(async (tx) => {
             let k: keyof CreateTagRequest;
-            let response: Record<string, Tag> = {};
             for (k in tagData) {
-                let record: Partial<Tag> = tagData[k]
+                let record: Partial<Tag> = tagData[k];
                 record.language = EnumLanguage[k];
-                await database.update(tag).set(record).where(and(eq(tag.id, id), eq(tag.language, record.language)));
+                await tx.update(tagsTable).set(record).where(and(eq(tagsTable.id, id), eq(tagsTable.language, record.language)));
             }
         }).then(() => true);
 
