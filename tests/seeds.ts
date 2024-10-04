@@ -34,6 +34,8 @@ export const navSeedDisabled: CreateNavRequest = {
 export const userSeed: Partial<User> = {
     fullName: "test",
     id: "potato",
+    username: "potato",
+    email: "potato@potato.com",
     password: "potato"
 }
 

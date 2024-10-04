@@ -5,9 +5,7 @@ import { CreateUserRequest } from "@blog/schemas/cemise.js";
 
 export const UserService = {
     add: async function (userData: CreateUserRequest): Promise<User[]> {
-        if (process.env.NODE_ENV !== "test") {
-            userData.password = await Bun.password.hashSync(userData.password, {algorithm: "bcrypt", cost: 12});
-        }
+        userData.password = await Bun.password.hashSync(userData.password, { algorithm: "bcrypt", cost: 12 });
         return database.insert(usersTable).values(userData).returning();
     },
 

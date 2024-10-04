@@ -65,7 +65,7 @@ test('test post listing', async () => {
 
 test('test post listing pagination', async () => {
     let resp: Response;
-    await UserService.add(userSeed);
+    await UserService.add(Object.assign({}, userSeed));
     for (const x of Array(15).keys()) {
         let post = JSON.parse(JSON.stringify(postSeed));
         post.content.EN.title+=x;
@@ -97,7 +97,7 @@ test('test post listing pagination', async () => {
 
 test('test tag post listing pagination', async () => {
     let resp: Response;
-    await UserService.add(userSeed);
+    await UserService.add(Object.assign({}, userSeed));
     let ticktok = true;
     const tag = await TagService.add(tagSeed);
     
@@ -134,10 +134,9 @@ test('test tag post listing pagination', async () => {
     expect(resp.body.posts[0].title).toBe("test10");
 });
 
-test('test tag post listing pagination', async () => {
+test('test tag info', async () => {
     let resp: Response;
     const tag = await TagService.add(tagSeed);
-
     
     resp = await supertest(server.server)
     .get("/tag/test")
