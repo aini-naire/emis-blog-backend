@@ -98,7 +98,7 @@ test('test post listing pagination', async () => {
 test('test tag post listing pagination', async () => {
     let resp: Response;
     await UserService.add(userSeed);
-    let ticktok = false;
+    let ticktok = true;
     const tag = await TagService.add(tagSeed);
     
     for (const x of Array(15).keys()) {
@@ -122,14 +122,14 @@ test('test tag post listing pagination', async () => {
     expect(resp.body.page).toBe(1);
     expect(resp.body.pages).toBe(2);
     expect(resp.body.posts.length).toBe(5);
-    expect(resp.body.posts[0].title).toBe("test1");
-    expect(resp.body.posts[4].title).toBe("test9");
+    expect(resp.body.posts[0].title).toBe("test0");
+    expect(resp.body.posts[4].title).toBe("test8");
 
     resp = await supertest(server.server)
-    .get("/tag/test/1")
+    .get("/tag/test/2")
     .expect(200);
     expect(resp.body.page).toBe(2);
     expect(resp.body.pages).toBe(2);
-    expect(resp.body.posts.length).toBe(5);
-    expect(resp.body.posts[0].title).toBe("test5");
+    expect(resp.body.posts.length).toBe(3);
+    expect(resp.body.posts[0].title).toBe("test10");
 });
