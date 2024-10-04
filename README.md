@@ -4,7 +4,7 @@ Simple personal Blog built from scratch
 #### Functionality:
  - [x] handle existing post tags removal/add
  - [ ] nav/tag/post deletion
- - [ ] rss
+ - [x] rss
  - [ ] rpi optimization
  - [x] improve services return consistency
  - [ ] deploytool logging

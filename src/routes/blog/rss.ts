@@ -33,6 +33,7 @@ export default async function RSSRoute(fastify: FastifyInstance) {
             const { language } = request.params as {language: Language};
             const [posts, postCount] = await PostListService.listPosts(language, 1, 20);
             const feed = new RSS(options);
+            feed.feed_url="https://blog.emicaval.tech/rss/"+language;
             posts.forEach((post) => {
                 feed.item({
                     title: post.title,
