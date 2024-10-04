@@ -1,5 +1,5 @@
 import { User } from "@blog/database/schema.js";
-import { CreateNavRequest, CreatePostRequest } from "@blog/schemas/cemise.js";
+import { CreateNavRequest, CreatePostRequest, CreateTagRequest } from "@blog/schemas/cemise.js";
 
 export const navSeed: CreateNavRequest = {
     EN: {
@@ -35,6 +35,19 @@ export const userSeed: Partial<User> = {
     fullName: "test",
     id: "potato",
     password: "potato"
+}
+
+export const tagSeed: CreateTagRequest = {
+    EN: {
+        title: "test",
+        url: "test",
+        tagline: "test",
+    },
+    PT: {
+        title: "teste",
+        url: "teste",
+        tagline: "test",
+    },
 }
 
 export const postSeed: CreatePostRequest = {
