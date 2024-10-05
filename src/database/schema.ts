@@ -25,6 +25,7 @@ const postsTable = sqliteTable("posts",
         showAuthor: integer("showAuthor", { mode: "boolean" }),
         page: integer("page", { mode: "boolean" }),
         private: integer("private", { mode: "boolean" }),
+        listInTagOnly: integer("listInTagOnly", { mode: "boolean" }),
     },
     (table) => {
         return {

@@ -6,6 +6,8 @@ import { navSeed, navSeedDisabled, postSeed, tagSeed, userSeed } from './seeds.j
 import { PostService } from '@blog/services/cemise/post.js';
 import { UserService } from '@blog/services/cemise/user.js';
 import { TagService } from '@blog/services/cemise/tag.js';
+import { CreatePostRequest } from '@blog/schemas/cemise.js';
+import { PostListService } from '@blog/services/blog/post.js';
 const supertest = require('supertest');
 
 const server = await buildServer();
@@ -103,6 +105,9 @@ test('test tag post listing pagination', async () => {
     
     for (const x of Array(15).keys()) {
         let post = JSON.parse(JSON.stringify(postSeed));
+        let created = new Date();
+        created.setDate(created.getDate() - x);
+        post.content.EN.created = created.toISOString();
         post.content.EN.title+=x;
         post.content.EN.url+=x;
         post.content.PT.title+=x;
@@ -142,4 +147,53 @@ test('test tag info', async () => {
     .get("/tag/test")
     .expect(200);
     expect(resp.body.tagline).toBe("test tagline")
+});
+
+test('test tag listing only', async () => {
+    let resp: Response;
+    let post: CreatePostRequest;
+    await UserService.add(Object.assign({}, userSeed));
+    let ticktok = true;
+    let ticktoktok = false;
+    const tag = await TagService.add(tagSeed);
+    
+    for (const x of Array(20).keys()) {
+        let post = JSON.parse(JSON.stringify(postSeed)); 
+        let created = new Date();
+        created.setDate(created.getDate() - x);
+        post.content.EN.created = created.toISOString();
+        post.content.EN.title+=x;
+        post.content.EN.url+=x;
+        post.content.PT.title+=x;
+        post.content.PT.url+=x;
+        if (ticktok) {
+            post.tags.push(tag.EN.id);
+            if (ticktoktok) {
+                post.content.EN.listInTagOnly = true;
+            }
+            ticktoktok=!ticktoktok;
+        }
+        await PostService.add(post, userSeed);
+        ticktok=!ticktok;
+      }
+
+    resp = await supertest(server.server)
+    .get("/tag/test/1")
+    .expect(200);
+
+    expect(resp.body.page).toBe(1);
+    expect(resp.body.pages).toBe(2);
+    expect(resp.body.posts.length).toBe(5);
+    expect(resp.body.posts[0].title).toBe("test0");
+    expect(resp.body.posts[4].title).toBe("test8");
+
+    resp = await supertest(server.server)
+    .get("/posts/EN/1")
+    .expect(200);
+    
+    expect(resp.body.page).toBe(1);
+    expect(resp.body.pages).toBe(3);
+    expect(resp.body.posts.length).toBe(5);
+    expect(resp.body.posts[0].title).toBe("test0");
+    expect(resp.body.posts[4].title).toBe("test5");
 });

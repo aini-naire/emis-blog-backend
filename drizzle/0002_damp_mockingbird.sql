@@ -1,0 +1,1 @@
+ALTER TABLE `posts` ADD `listInTagOnly` integer DEFAULT 0;

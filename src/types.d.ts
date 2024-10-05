@@ -82,6 +82,7 @@ export type PostBase = {
     showAuthor: boolean;
     private: boolean;
     page: boolean;
+    listInTagOnly: boolean;
     author: Author,
     tags?: Tag[];
 }
@@ -95,6 +96,7 @@ export type NewPost = {
     showAuthor: boolean;
     private: boolean;
     page: boolean;
+    listInTagOnly: boolean;
 }
 
 export type CreatePostRequest = {
