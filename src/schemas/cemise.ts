@@ -82,6 +82,7 @@ export const PostBase = Type.Object({
     showAuthor: Type.Boolean(),
     private: Type.Boolean(),
     page: Type.Boolean(),
+    listInTagOnly: Type.Boolean(),
     author: Author,
     tags: Type.Optional(Type.Array(Tag))
 })
@@ -95,7 +96,8 @@ export const NewPost = Type.Object({
     hidden: Type.Boolean(),
     showAuthor: Type.Boolean(),
     private: Type.Boolean(),
-    page: Type.Boolean()
+    page: Type.Boolean(),
+    listInTagOnly: Type.Boolean()
 })
 
 export type CreatePostRequest = Static<typeof CreatePostRequest>

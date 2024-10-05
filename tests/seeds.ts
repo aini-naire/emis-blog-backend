@@ -6,12 +6,14 @@ export const navSeed: CreateNavRequest = {
         text: "test",
         url: "test",
         enabled: true,
+        external: false,
         order: 1
     },
     PT: {
         text: "teste",
         url: "teste",
         enabled: true,
+        external: false,
         order: 1
     },
 }
@@ -21,12 +23,14 @@ export const navSeedDisabled: CreateNavRequest = {
         text: "test2",
         url: "test2",
         enabled: false,
+        external: false,
         order: 1
     },
     PT: {
         text: "teste2",
         url: "teste2",
         enabled: false,
+        external: false,
         order: 1
     },
 }
@@ -63,6 +67,7 @@ export const postSeed: CreatePostRequest = {
             showAuthor: false,
             private: false,
             page: false,
+            listInTagOnly: false,
         },
         PT: {
             url: "teste",
@@ -73,6 +78,7 @@ export const postSeed: CreatePostRequest = {
             showAuthor: false,
             private: false,
             page: false,
+            listInTagOnly: false,
         }
     },
     tags: []

@@ -3,7 +3,7 @@ import { database } from "@blog/plugins/database.js";
 import { CreatePostRequest, EnumLanguage, PostResponse, PostsResponse } from "@blog/schemas/cemise.js";
 import PostSerializer from "@blog/util/PostSerializer.js";
 import { randomUUID } from "crypto";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 
 export const PostService = {
@@ -31,7 +31,7 @@ export const PostService = {
     },
 
     list: async function (): Promise<PostsResponse> {
-        const posts = await database.query.postsTable.findMany({ with: { author: true, postTags: { with: { tag: true } } } });
+        const posts = await database.query.postsTable.findMany({ orderBy:(post, { desc }) => [desc(post.created)], with: { author: true, postTags: { with: { tag: true } } } });
         return PostSerializer.posts(posts);
     },
 

@@ -39,7 +39,7 @@ const PostListService = {
         const postsQuery = database.select(postSelect)
             .from(postsTable)
             .fullJoin(usersTable, eq(postsTable.authorId, usersTable.id))
-            .where(and(eq(postsTable.language, language), eq(postsTable.hidden, false), eq(postsTable.page, false), eq(postsTable.private, false)))
+            .where(and(eq(postsTable.language, language), eq(postsTable.hidden, false), eq(postsTable.page, false), eq(postsTable.private, false), eq(postsTable.listInTagOnly, false)))
             .offset((page - 1) * results)
             .limit(results)
             .orderBy(desc(postsTable.created)).as("post");
@@ -49,7 +49,7 @@ const PostListService = {
             .rightJoin(postsQuery, and(eq(postTagsTable.postid, postsQuery.id), eq(postTagsTable.language, language)))
             .leftJoin(tagsTable, and(eq(postTagsTable.tagid, tagsTable.id), eq(tagsTable.language, language)));
 
-        const countQuery = database.select({ posts: count() }).from(postsTable).where(and(eq(postsTable.language, language), eq(postsTable.hidden, false), eq(postsTable.page, false), eq(postsTable.private, false)));
+        const countQuery = database.select({ posts: count() }).from(postsTable).where(and(eq(postsTable.language, language), eq(postsTable.hidden, false), eq(postsTable.page, false), eq(postsTable.private, false), eq(postsTable.listInTagOnly, false)));
         const [posts, postCount] = await Promise.all([tagsQuery, countQuery]);
         return [postQueryReducer(posts), postCount[0].posts];
     },
