@@ -134,6 +134,27 @@ export type UserResponse = {
     fullName: string;
 }
 
+export enum ImageType {
+    POST = "POST",
+    LOG = "LOG",
+}
+
+export type ImageBase = {
+    /**
+     * @type uuid
+     */
+    id: string;
+    originalFilename: string;
+    filename: string;
+    type: ImageType;
+    /**
+     * @type date-time
+     */
+    created: string;
+}
+
+export type ImagesResponse = ImageBase[];
+
 export type LoginRequest = {
     username: string;
     password: string;

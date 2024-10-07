@@ -128,6 +128,26 @@ export const UserResponse = Type.Object({
     fullName: Type.String()
 })
 
+export enum EnumImageType {
+    POST = 'POST',
+    LOG = 'LOG'
+}
+
+export type ImageType = Static<typeof ImageType>
+export const ImageType = Type.Enum(EnumImageType)
+
+export type ImageBase = Static<typeof ImageBase>
+export const ImageBase = Type.Object({
+    id: Type.String({ type: 'uuid' }),
+    originalFilename: Type.String(),
+    filename: Type.String(),
+    type: ImageType,
+    created: Type.String({ type: 'date' })
+})
+
+export type ImagesResponse = Static<typeof ImagesResponse>
+export const ImagesResponse = Type.Array(ImageBase)
+
 export type LoginRequest = Static<typeof LoginRequest>
 export const LoginRequest = Type.Object({
     username: Type.String(),
