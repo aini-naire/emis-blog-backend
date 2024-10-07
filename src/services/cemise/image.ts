@@ -6,8 +6,6 @@ import { pipeline } from "node:stream/promises";
 import { createWriteStream } from "node:fs";
 import { randomUUID } from "crypto";
 import { MultipartFile } from "@fastify/multipart";
-import imagemin from 'imagemin';
-import imageminWebp from 'imagemin-webp';
 
 const imageMimeTypes = [
     'image/webp',
@@ -22,12 +20,6 @@ export const ImageService = {
         if (!(imageMimeTypes.includes(part.mimetype))) { await part.toBuffer(); return null; }
         const filename = randomUUID();
         await pipeline(part.file, createWriteStream(process.env.UPLOAD_FOLDER + filename));
-        await imagemin([process.env.UPLOAD_FOLDER + filename], {
-            destination: process.env.UPLOAD_FOLDER,
-            plugins: [
-                imageminWebp({ quality: 95, method: 4, lossless: 9, metadata: "none" })
-            ]
-        });
         const image = await database.insert(imagesTable).values({ originalFilename: part.filename, filename: filename, type: type }).returning();
 
         return image.length ? image[0] : null;
