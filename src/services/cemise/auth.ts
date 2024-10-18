@@ -10,15 +10,15 @@ export const AuthService = {
             .select()
             .from(usersTable)
             .where(eq(usersTable.username, userCredentials.username))
-            .then((user) => {
+            .then(async (user) => {
                 if (user.length) {
-                    if (Bun.password.verifySync(userCredentials.password, user[0].password)) {
+                    if (await Bun.password.verify(userCredentials.password, user[0].password)) {
                         return user[0];
                     }
                 }
                 return null;
-            }).catch((e) => {
-                const password = Bun.password.verifySync(userCredentials.password, "potato");
+            }).catch(async (e) => {
+                const password = await Bun.password.verify(userCredentials.password, "potato");
                 return null;
             });
     },

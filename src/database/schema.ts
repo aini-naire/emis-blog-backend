@@ -102,10 +102,21 @@ const navTable = sqliteTable("nav", {
         };
     });
 
+const imagesTable = sqliteTable("images", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => randomUUID()),
+    originalFilename: text("original_filename"),
+    filename: text("filename"),
+    type: text("type", { enum: ["POST", "LOG"] }),
+    created: text("created").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
 type User = typeof usersTable.$inferSelect;
 type Post = typeof postsTable.$inferSelect;
 type PostTag = typeof postTagsTable.$inferSelect;
 type Nav = typeof navTable.$inferSelect;
 type Tag = typeof tagsTable.$inferSelect;
+type Image = typeof imagesTable.$inferSelect;
 
-export { postsTable, postTagsTable, tagsTable, navTable, usersTable, tagRelations, postRelations, postTagsRelations, User, Post, PostTag, Nav, Tag }
+export { postsTable, postTagsTable, tagsTable, navTable, usersTable, imagesTable, tagRelations, postRelations, postTagsRelations, User, Post, PostTag, Nav, Tag, Image }

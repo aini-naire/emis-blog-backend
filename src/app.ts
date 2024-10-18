@@ -7,6 +7,7 @@ import { FastifyJWT, JWT, fastifyJwt } from "@fastify/jwt";
 import cors from '@fastify/cors'
 import { Static, Type } from "@fastify/type-provider-typebox";
 import { User } from "./database/schema.js";
+import { fastifyMultipart } from "@fastify/multipart";
 
 type ConfigSchema = Static<typeof ConfigSchema>
 const ConfigSchema = Type.Object({
@@ -16,6 +17,7 @@ const ConfigSchema = Type.Object({
     CEMISE_URL: Type.String(),
     BLOG_URL: Type.String(),
     HOST: Type.String(),
+    UPLOAD_FOLDER: Type.String(),
 })
 
 declare module "fastify" {
@@ -58,6 +60,8 @@ const buildServer = async () => {
         }
     });
 
+    server.register(fastifyMultipart, {limits: {fileSize: 10000000}});
+
     if (server.config.NODE_ENV !== "production") {
         server.register(swagger);
     }
@@ -69,6 +73,7 @@ const buildServer = async () => {
     await server.register(import("@blog/routes/blog/rss.js"), {});
     await server.register(import("@blog/routes/blog/seo.js"), { prefix: "/seo" });
     await server.register(import("@blog/routes/cemise/auth.js"), { prefix: "/cemise" });
+    await server.register(import("@blog/routes/cemise/image.js"), { prefix: "/cemise" });
     await server.register(import("@blog/routes/cemise/nav.js"), { prefix: "/cemise" });
     await server.register(import("@blog/routes/cemise/post.js"), { prefix: "/cemise" });
     await server.register(import("@blog/routes/cemise/tag.js"), { prefix: "/cemise" });
